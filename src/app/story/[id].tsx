@@ -8,8 +8,8 @@ import { plannedLanguages } from "@/models/catalog";
 import {
   creatorBio,
   getPreviewChapters,
-  previewReviews,
-  reviewSummary,
+  getStoryReviews,
+  summarizeReviews,
   sortChapters,
   storyTags,
 } from "@/services/story-details";
@@ -55,10 +55,12 @@ function StoryContent({ story }: { story: Story }) {
         ),
     )
     .slice(0, 8);
+  const storyReviews = getStoryReviews(story.id);
+  const reviewSummary = summarizeReviews(storyReviews);
   const reviews =
     reviewSort === "Highest rated"
-      ? [...previewReviews].sort((a, b) => b.rating - a.rating)
-      : [...previewReviews].reverse();
+      ? [...storyReviews].sort((a, b) => b.rating - a.rating)
+      : [...storyReviews].reverse();
   const explain = (title: string, body: string) => {
     setInfo({ title, body });
     setDialog("info");
@@ -148,7 +150,9 @@ function StoryContent({ story }: { story: Story }) {
               </Txt>
             </Pressable>
             <Txt style={{ fontSize: 11, lineHeight: 18, color: theme.accent }}>
-              ★ {reviewSummary.average.toFixed(1)}{" "}
+              {reviewSummary.average === null
+                ? "Not yet rated"
+                : `★ ${reviewSummary.average?.toFixed(1)}`}{" "}
               <Txt muted style={{ fontSize: 11 }}>
                 · {reviewSummary.count} reviews
               </Txt>
@@ -313,108 +317,142 @@ function StoryContent({ story }: { story: Story }) {
           />
         }
       >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
-          <View style={{ gap: 3 }}>
-            <Txt title style={{ fontSize: 34, lineHeight: 40 }}>
-              {reviewSummary.average.toFixed(1)}
-              <Txt muted style={{ fontSize: 14 }}>
-                {" "}
-                / 5
-              </Txt>
-            </Txt>
-            <Txt style={{ fontSize: 12, color: theme.accent }}>★★★★★</Txt>
-            <Txt muted style={{ fontSize: 11 }}>
-              {reviewSummary.count} reader reviews
-            </Txt>
-          </View>
-          <View style={{ flex: 1, gap: 4 }}>
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <View
-                key={rating}
-                style={{ flexDirection: "row", gap: 7, alignItems: "center" }}
-              >
-                <Txt muted style={{ fontSize: 10, lineHeight: 12, width: 9 }}>
-                  {rating}
+        {reviewSummary.count > 0 ? (
+          <>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 20 }}
+            >
+              <View style={{ gap: 3 }}>
+                <Txt title style={{ fontSize: 34, lineHeight: 40 }}>
+                  {reviewSummary.average?.toFixed(1)}
+                  <Txt muted style={{ fontSize: 14 }}>
+                    {" "}
+                    / 5
+                  </Txt>
                 </Txt>
+                <Txt style={{ fontSize: 12, color: theme.accent }}>
+                  {"★".repeat(Math.round(reviewSummary.average ?? 0))}
+                  {"☆".repeat(5 - Math.round(reviewSummary.average ?? 0))}
+                </Txt>
+                <Txt muted style={{ fontSize: 11 }}>
+                  {reviewSummary.count} reader reviews
+                </Txt>
+              </View>
+              <View style={{ flex: 1, gap: 4 }}>
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <View
+                    key={rating}
+                    style={{
+                      flexDirection: "row",
+                      gap: 7,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Txt
+                      muted
+                      style={{ fontSize: 10, lineHeight: 12, width: 9 }}
+                    >
+                      {rating}
+                    </Txt>
+                    <View
+                      style={{
+                        flex: 1,
+                        height: 4,
+                        borderRadius: 2,
+                        backgroundColor: theme.surface,
+                      }}
+                    >
+                      <View
+                        style={{
+                          height: 4,
+                          borderRadius: 2,
+                          width: `${(storyReviews.filter((r) => r.rating === rating).length / reviewSummary.count) * 100}%`,
+                          backgroundColor: theme.accent,
+                        }}
+                      />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+            <Txt muted style={{ fontSize: 12 }}>
+              {reviewSummary.spice === null
+                ? "No reader spice ratings yet."
+                : `Reader spice · ${reviewSummary.spice.toFixed(1)}/5 · ${reviewSummary.spiceCount} reader-submitted ratings`}
+            </Txt>
+            <View style={{ alignSelf: "flex-start" }}>
+              <Chip
+                label={
+                  reviewSort === "Recent"
+                    ? "Recent reviews"
+                    : "Highest rated reviews"
+                }
+                active={false}
+                onPress={() =>
+                  setReviewSort((v) =>
+                    v === "Recent" ? "Highest rated" : "Recent",
+                  )
+                }
+              />
+            </View>
+            {reviews.map((review) => (
+              <View
+                key={review.id}
+                style={{
+                  paddingVertical: 12,
+                  borderBottomWidth: 1,
+                  borderColor: theme.accent + "18",
+                  gap: 8,
+                }}
+              >
                 <View
                   style={{
-                    flex: 1,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: theme.surface,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
                   }}
                 >
-                  <View
-                    style={{
-                      height: 4,
-                      borderRadius: 2,
-                      width: `${(previewReviews.filter((r) => r.rating === rating).length / reviewSummary.count) * 100}%`,
-                      backgroundColor: theme.accent,
-                    }}
-                  />
+                  <Avatar initials={review.initials} size={30} />
+                  <View style={{ flex: 1 }}>
+                    <Txt style={{ fontSize: 12, fontWeight: "600" }}>
+                      {review.reader}
+                    </Txt>
+                    <Txt muted style={{ fontSize: 10, lineHeight: 16 }}>
+                      {review.spice === null
+                        ? "Spice not rated"
+                        : `Spice ${review.spice}/5`}
+                    </Txt>
+                  </View>
+                  <Txt style={{ fontSize: 11, color: theme.accent }}>
+                    {"★".repeat(review.rating)}
+                  </Txt>
                 </View>
+                <Txt style={{ fontSize: 14, fontWeight: "600" }}>
+                  {review.title}
+                </Txt>
+                <Txt muted style={{ fontSize: 13, lineHeight: 21 }}>
+                  {review.body}
+                </Txt>
+                <TextAction
+                  label="Report review"
+                  muted
+                  onPress={() => unavailable("Report review")}
+                />
               </View>
             ))}
-          </View>
-        </View>
-        <Txt muted style={{ fontSize: 12 }}>
-          Reader spice · {reviewSummary.spice.toFixed(1)}/5 ·{" "}
-          {reviewSummary.count} reader-submitted ratings
-        </Txt>
-        <View style={{ alignSelf: "flex-start" }}>
-          <Chip
-            label={
-              reviewSort === "Recent"
-                ? "Recent reviews"
-                : "Highest rated reviews"
-            }
-            active={false}
-            onPress={() =>
-              setReviewSort((v) =>
-                v === "Recent" ? "Highest rated" : "Recent",
-              )
-            }
-          />
-        </View>
-        {reviews.map((review) => (
-          <View
-            key={review.id}
-            style={{
-              paddingVertical: 12,
-              borderBottomWidth: 1,
-              borderColor: theme.accent + "18",
-              gap: 8,
-            }}
-          >
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
-            >
-              <Avatar initials={review.initials} size={30} />
-              <View style={{ flex: 1 }}>
-                <Txt style={{ fontSize: 12, fontWeight: "600" }}>
-                  {review.reader}
-                </Txt>
-                <Txt muted style={{ fontSize: 10, lineHeight: 16 }}>
-                  Spice {review.spice}/5
-                </Txt>
-              </View>
-              <Txt style={{ fontSize: 11, color: theme.accent }}>
-                {"★".repeat(review.rating)}
-              </Txt>
-            </View>
-            <Txt style={{ fontSize: 14, fontWeight: "600" }}>
-              {review.title}
-            </Txt>
+          </>
+        ) : (
+          <View style={{ gap: 8 }}>
+            <Txt>No reviews yet.</Txt>
             <Txt muted style={{ fontSize: 13, lineHeight: 21 }}>
-              {review.body}
+              This story has no reader ratings or written reviews in the demo
+              catalog.
             </Txt>
-            <TextAction
-              label="Report review"
-              muted
-              onPress={() => unavailable("Report review")}
-            />
+            <Txt muted style={{ fontSize: 12 }}>
+              No reader spice ratings yet.
+            </Txt>
           </View>
-        ))}
+        )}
       </DetailSection>
       <DetailSection title="About the Creator">
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>

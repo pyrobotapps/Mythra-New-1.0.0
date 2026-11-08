@@ -42,3 +42,14 @@ export const featureFlags = {
   publishing: false,
   remoteAccounts: false,
 } as const;
+
+/** Resolve edition codes, full names, or native compact names without defaulting unknown editions to English. */
+export function compactLanguageLabel(edition: string): string {
+  const value = edition.trim().toLocaleLowerCase();
+  const language = plannedLanguages.find((item) =>
+    [item.code, item.label, item.compact].some(
+      (label) => label.toLocaleLowerCase() === value,
+    ),
+  );
+  return language?.compact ?? edition;
+}

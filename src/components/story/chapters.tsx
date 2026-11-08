@@ -1,3 +1,4 @@
+import { compactLanguageLabel } from "@/models/catalog";
 import { Pressable, View } from "react-native";
 import { chapterDate, PreviewChapter } from "@/services/story-details";
 import { useTheme } from "@/theme";
@@ -14,7 +15,7 @@ export function ChapterRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Chapter ${chapter.number}, ${chapter.title}, ${chapterDate(chapter.publishedAt)}, ${chapter.read ? "Read" : "Unread"}, ${chapter.access}`}
+      accessibilityLabel={`Chapter ${chapter.number}, ${chapter.title}, ${chapterDate(chapter.publishedAt)}, ${chapter.read ? "Read" : "Unread"}, ${chapter.access}, ${chapter.edition}`}
       onPress={onOpen}
       style={({ pressed }) => ({
         paddingVertical: 13,
@@ -42,7 +43,8 @@ export function ChapterRow({
         </Txt>
         <Txt muted style={{ fontSize: 10, lineHeight: 16 }}>
           {chapterDate(chapter.publishedAt)} ·{" "}
-          {chapter.read ? "Read" : "Unread"} · {chapter.access} · EN
+          {chapter.read ? "Read" : "Unread"} · {chapter.access} ·{" "}
+          {compactLanguageLabel(chapter.edition)}
         </Txt>
       </View>
       <Icon name="arrow" color={theme.muted} size={12} />

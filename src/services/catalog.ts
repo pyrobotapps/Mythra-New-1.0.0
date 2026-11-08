@@ -218,3 +218,10 @@ export function toggleSelection(values: string[], value: string) {
     ? values.filter((v) => v !== value)
     : [...values, value];
 }
+
+/** Fixed editorial preview order, not live platform analytics. */
+export function chartPreview(format: string): Story[] {
+  return visibleStories
+    .filter((story) => story.format === format && !story.comingSoon)
+    .slice(0, 5);
+}

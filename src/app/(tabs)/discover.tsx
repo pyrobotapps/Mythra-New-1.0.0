@@ -1,3 +1,11 @@
+import {
+  BookListCollection,
+  ComingSoonSpread,
+  DoubleCollection,
+  EditorsPick,
+  RankedBooks,
+  ReleaseSpreads,
+} from "@/components/discover/editorial";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -11,7 +19,7 @@ import {
   Txt,
   styles,
 } from "@/components/ui";
-import { ChartRow, SearchField, StoreHeader } from "@/components/bookstore";
+import { SearchField, StoreHeader } from "@/components/bookstore";
 import {
   ChartSegments,
   GenreCollections,
@@ -21,6 +29,7 @@ import { FilterSheet } from "@/components/catalog-filters";
 import { IconButton } from "@/components/glass";
 import {
   collectionStories,
+  chartPreview,
   emptyFilters,
   genres,
   searchCatalog,
@@ -61,15 +70,7 @@ export default function Discover() {
   const released = visibleStories.filter((s) => !s.comingSoon);
   const releases = [...released].reverse().slice(0, 8);
   const noteworthy = collectionStories("new").filter((s) => !s.comingSoon);
-  const top = collectionStories(
-    chartFormat === "Novel"
-      ? "novels"
-      : chartFormat === "Toon"
-        ? "toons"
-        : "shorts",
-  )
-    .filter((s) => !s.comingSoon)
-    .slice(0, 3);
+  const top = chartPreview(chartFormat);
   return (
     <Page gap={28}>
       <View style={{ gap: 12 }}>
@@ -210,73 +211,41 @@ export default function Discover() {
         </View>
       ) : (
         <>
-          <Shelf
-            title="New Releases"
-            subtitle="Fresh voices. New worlds. Your next chapter."
-            stories={releases}
-            width={154}
-          />
-          <Shelf
-            title="New & Noteworthy"
-            subtitle="A few stories we think you’ll love"
-            stories={noteworthy}
-            twoRows
-            width={136}
-          />
-          <View style={{ gap: 14 }}>
+          <ReleaseSpreads stories={releases} />
+          <DoubleCollection stories={noteworthy} />
+          <View style={{ gap: 14, paddingTop: 18, paddingBottom: 12 }}>
             <SectionHeading
               title="Top Charts"
               subtitle="The US editorial preview chart"
               onSeeAll={() => router.push("/rankings")}
             />
             <ChartSegments value={chartFormat} onChange={setChartFormat} />
-            <View>
-              {top.map((story, index) => (
-                <ChartRow
-                  key={story.id}
-                  story={story}
-                  rank={index + 1}
-                  sampleLabel={false}
-                />
-              ))}
-            </View>
+            <RankedBooks stories={top} />
           </View>
           <Shelf
             title="Trending Now"
             subtitle="Stories to get lost in"
             stories={collectionStories("trending").filter((s) => !s.comingSoon)}
             collectionKey="trending"
+            width={160}
           />
           <GenreCollections />
           <RelationshipCollections />
-          <Shelf
-            title="Coming Soon"
-            subtitle="A first look at your next obsession"
-            stories={collectionStories("soon")}
-            collectionKey="soon"
-            width={172}
-          />
-          <Shelf
+          <ComingSoonSpread stories={collectionStories("soon")} />
+          <BookListCollection
             title="Hidden Gems"
-            subtitle="Something unexpected, something unforgettable"
+            subtitle="Unexpected finds for your next quiet evening"
             stories={collectionStories("gems")}
-            collectionKey="gems"
           />
-          <Shelf
-            title="Editor’s Picks"
-            subtitle="Handpicked for a little escape"
-            stories={collectionStories("editors")}
-            collectionKey="editors"
-            width={154}
-          />
-          <Shelf
+          <EditorsPick stories={collectionStories("editors")} />
+          <BookListCollection
             title="Completed Stories"
-            subtitle="The whole story is waiting"
+            subtitle="From the first page to the very last"
             stories={collectionStories("completed")}
-            collectionKey="completed"
           />
           <Shelf
             title="Popular in Your Language"
+            width={160}
             subtitle="English editions · Curated preview selection"
             stories={collectionStories("picks").filter((s) =>
               s.languages.includes("English"),

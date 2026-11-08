@@ -158,21 +158,70 @@ test("story details begins with 15 newest chapters and can reverse the order wit
     chapters[0].id,
   );
 });
-test("review summary and spice ratings derive from preview readers", () => {
-  assert.equal(details.reviewSummary.count, details.previewReviews.length);
-  assert.equal(
-    details.reviewSummary.average,
-    details.previewReviews.reduce((sum, r) => sum + r.rating, 0) /
-      details.previewReviews.length,
-  );
-  assert.equal(
-    details.reviewSummary.spice,
-    details.previewReviews.reduce((sum, r) => sum + r.spice, 0) /
-      details.previewReviews.length,
-  );
+test("review fixtures belong only to their explicit story", () => {
+  const moonlit = details.getStoryReviews("moonlit-vow");
+  const garden = details.getStoryReviews("garden-of-us");
+  assert.ok(moonlit.length > 0 && garden.length > 0);
+  assert.ok(moonlit.every((review) => review.storyId === "moonlit-vow"));
+  assert.ok(garden.every((review) => review.storyId === "garden-of-us"));
   assert.ok(
-    details.previewReviews.every(
-      (r) => r.reader && r.spice >= 0 && r.spice <= 5,
+    moonlit.every(
+      (review) =>
+        !garden.some(
+          (other) => other.id === review.id || other.body === review.body,
+        ),
     ),
   );
+  assert.notEqual(
+    details.summarizeReviews(moonlit).average,
+    details.summarizeReviews(garden).average,
+  );
+});
+test("unreviewed and unknown stories have no fabricated rating or spice score", () => {
+  for (const id of ["tidebound", "city-of-kites", "missing"]) {
+    const reviews = details.getStoryReviews(id);
+    assert.equal(reviews.length, 0);
+    assert.deepEqual(details.summarizeReviews(reviews), {
+      count: 0,
+      average: null,
+      spiceCount: 0,
+      spice: null,
+    });
+  }
+});
+test("review averages count only submitted spice ratings and retain a genuine zero", () => {
+  const reviews = details.getStoryReviews("garden-of-us");
+  const summary = details.summarizeReviews(reviews);
+  assert.equal(summary.count, 2);
+  assert.equal(summary.average, 5);
+  assert.equal(summary.spiceCount, 1);
+  assert.equal(summary.spice, 0);
+  assert.deepEqual(
+    details.summarizeReviews(reviews.map((r) => ({ ...r, spice: null }))),
+    { count: 2, average: 5, spiceCount: 0, spice: null },
+  );
+});
+const { compactLanguageLabel } = load("src/models/catalog.ts");
+test("chapter edition labels resolve all launch codes and full names instead of defaulting to EN", () => {
+  for (const language of plannedLanguages) {
+    assert.equal(compactLanguageLabel(language.code), language.compact);
+    assert.equal(compactLanguageLabel(language.label), language.compact);
+    assert.equal(compactLanguageLabel(language.compact), language.compact);
+  }
+  assert.equal(compactLanguageLabel(" KO "), "한국어");
+  assert.equal(compactLanguageLabel("Portuguese"), "Portuguese");
+});
+test("chart previews include up to five released books of each selected format", () => {
+  for (const format of catalog.formats) {
+    const available = catalog.visibleStories.filter(
+      (story) => story.format === format && !story.comingSoon,
+    );
+    const preview = catalog.chartPreview(format);
+    assert.equal(preview.length, Math.min(5, available.length));
+    assert.equal(new Set(preview.map((s) => s.id)).size, preview.length);
+    assert.ok(
+      preview.every((story) => story.format === format && !story.comingSoon),
+    );
+  }
+  assert.deepEqual(catalog.chartPreview("unknown"), []);
 });

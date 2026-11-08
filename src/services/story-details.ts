@@ -47,42 +47,82 @@ export function chapterDate(iso: string) {
     timeZone: "UTC",
   }).format(new Date(iso));
 }
-export const previewReviews = [
-  {
-    id: "r1",
-    reader: "Luna Reads",
-    initials: "LR",
-    rating: 5,
-    spice: 1,
-    title: "A beautiful escape",
-    body: "The atmosphere stayed with me long after I put it down. I loved the small moments between the characters.",
-  },
-  {
-    id: "r2",
-    reader: "Page Wanderer",
-    initials: "PW",
-    rating: 4,
-    spice: 2,
-    title: "Stayed for the storytelling",
-    body: "Thoughtful world-building and a voice that makes even quiet scenes feel alive. Looking forward to more.",
-  },
-  {
-    id: "r3",
-    reader: "River",
-    initials: "R",
-    rating: 5,
-    spice: 1,
-    title: "One more chapter",
-    body: "A lovely balance of wonder and heart. The kind of story I want to share with a friend.",
-  },
-];
-export const reviewSummary = {
-  average:
-    previewReviews.reduce((n, r) => n + r.rating, 0) / previewReviews.length,
-  count: previewReviews.length,
-  spice:
-    previewReviews.reduce((n, r) => n + r.spice, 0) / previewReviews.length,
+export type PreviewReview = {
+  id: string;
+  storyId: string;
+  reader: string;
+  initials: string;
+  rating: number;
+  spice: number | null;
+  title: string;
+  body: string;
 };
+/** Explicitly fictional, story-scoped reader feedback. Unlisted stories have no reviews. */
+const reviewsByStory: Readonly<Record<string, readonly PreviewReview[]>> = {
+  "moonlit-vow": [
+    {
+      id: "moonlit-vow:r1",
+      storyId: "moonlit-vow",
+      reader: "Luna Reads",
+      initials: "LR",
+      rating: 5,
+      spice: 2,
+      title: "A map worth following",
+      body: "The cartographer and the runaway prince make such an interesting pair. The impossible kingdom is what drew me in; their fragile trust kept me reading.",
+    },
+    {
+      id: "moonlit-vow:r2",
+      storyId: "moonlit-vow",
+      reader: "Northbound",
+      initials: "N",
+      rating: 4,
+      spice: 1,
+      title: "Promises under a silver moon",
+      body: "I loved the idea of a map remembering a lost kingdom. The quieter conversations on the road were my favorite moments.",
+    },
+  ],
+  "garden-of-us": [
+    {
+      id: "garden-of-us:r1",
+      storyId: "garden-of-us",
+      reader: "Fern & Paper",
+      initials: "FP",
+      rating: 5,
+      spice: 0,
+      title: "A gentle place to begin again",
+      body: "The greenhouse feels like a character of its own. Watching these two women rebuild it together made for a wonderfully comforting read.",
+    },
+    {
+      id: "garden-of-us:r2",
+      storyId: "garden-of-us",
+      reader: "Solstice Reader",
+      initials: "SR",
+      rating: 5,
+      spice: null,
+      title: "Love in the small things",
+      body: "Rain, handwritten notes, and a stubborn little garden. I appreciated how much the relationship grows through ordinary acts of care.",
+    },
+  ],
+};
+export function getStoryReviews(storyId: string): readonly PreviewReview[] {
+  return reviewsByStory[storyId] ?? [];
+}
+export function summarizeReviews(reviews: readonly PreviewReview[]) {
+  const spiceRatings = reviews.flatMap((review) =>
+    review.spice === null ? [] : [review.spice],
+  );
+  return {
+    count: reviews.length,
+    average: reviews.length
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+      : null,
+    spiceCount: spiceRatings.length,
+    spice: spiceRatings.length
+      ? spiceRatings.reduce((sum, value) => sum + value, 0) /
+        spiceRatings.length
+      : null,
+  };
+}
 export function creatorBio(story: Story) {
   return `${story.author} creates character-driven ${story.genre.toLowerCase()} stories about connection, courage, and finding a place to belong. Part of the MYTHRA preview catalog.`;
 }
