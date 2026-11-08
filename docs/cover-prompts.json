@@ -1,0 +1,107 @@
+{
+  "tool": "Built-in image_gen.imagegen",
+  "transparent_background": false,
+  "notes": "Original fictional demo cover art. Titles and author names are rendered by the app. Output PNGs converted to JPEG at 900px maximum edge for mobile use.",
+  "prompts": [
+    {
+      "id": "moonlit-vow",
+      "prompt": "Portrait book cover illustration, 2:3 aspect ratio, full bleed, no border. A moonlit fantasy palace above a violet sea, two adult male travelers in long coats seen from behind on a bridge, tiny figures, luminous enormous crescent moon, silver botanical framing, luxurious painterly detail, amethyst and midnight blue. Original artwork for fictional novel The Moonlit Vow. Leave upper quarter dark and quiet for title overlaid in app. Absolutely no text, no lettering, no watermark.",
+      "file": "assets/covers/moonlit-vow.jpg"
+    },
+    {
+      "id": "garden-of-us",
+      "prompt": "Portrait book cover illustration 2:3 full bleed. Two adult women in a lush old glass greenhouse with climbing roses and abundant plants, warm afternoon light, romantic literary fiction, deep green and blush pink, sophisticated painterly realistic illustration, generous quiet dark foliage in upper quarter for title overlaid later. Original art for A Garden of Us. No text, letters, logo, watermark.",
+      "file": "assets/covers/garden-of-us.jpg"
+    },
+    {
+      "id": "tidebound",
+      "prompt": "Portrait full bleed 2:3 premium webcomic book cover artwork, original illustration: two adult male sailors by a lighthouse at the edge of a turquoise ocean, gigantic curling waves and scattered glowing stars, elegant Korean webtoon style, cinematic dramatic lighting, midnight navy and teal, detailed and polished, upper quarter quiet dark sky for app title overlay. No text, no watermark.",
+      "file": "assets/covers/tidebound.jpg"
+    },
+    {
+      "id": "velvet-hours",
+      "prompt": "Portrait full bleed 2:3 original book cover art for fictional webcomic The Velvet Hours: two adult women, one a pianist with short dark hair, one a photographer in a long coat, atmospheric midnight jazz club with warm brass lamps, berry purple and rose palette, sophisticated graphic-novel illustration, cinematic city rain in window, upper quarter dark negative space for title added in app. No text no letters no watermark.",
+      "file": "assets/covers/velvet-hours.jpg"
+    },
+    {
+      "id": "last-orchard",
+      "prompt": "Original portrait 2:3 literary book cover illustration, full bleed, single ancient fruit tree glowing gold in a quiet overgrown orchard at dusk, tiny gardener silhouette, delicate painterly texture, forest green and antique gold, premium hardcover artwork, upper quarter quiet for title. No text or lettering, no watermark.",
+      "file": "assets/covers/last-orchard.jpg"
+    },
+    {
+      "id": "house-of-rain",
+      "prompt": "Original portrait 2:3 literary mystery book cover illustration full bleed, atmospheric old coastal house reflected in rain puddles, one amber window, foggy blue gray twilight, detailed painted realism, botanical shadows and weathered architecture, upper quarter quiet dark sky for title. No text no lettering no watermark.",
+      "file": "assets/covers/house-of-rain.jpg"
+    },
+    {
+      "id": "paper-hearts",
+      "prompt": "Original portrait 2:3 literary romance cover illustration full bleed, warm Paris-like independent bookshop with overflowing shelves and a glowing window, an adult man and adult woman sitting reading at a table, cozy amber terracotta cream colors, elegant painterly art, upper quarter quiet for title overlay. No text, letters, watermark.",
+      "file": "assets/covers/paper-hearts.jpg"
+    },
+    {
+      "id": "between-stars",
+      "prompt": "Original portrait 2:3 science fiction book cover illustration full bleed, tiny damaged spacecraft moving towards an enormous luminous ringed planet, distant blue and lavender nebulae, cinematic realistic painted art, premium science fiction hardcover artwork, upper quarter dark space for title overlay. No text or watermark.",
+      "file": "assets/covers/between-stars.jpg"
+    },
+    {
+      "id": "a-little-magic",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. cozy romantic fantasy, two adult women witches sharing tea in a tiny enchanted bookshop, blush lavender, elegant illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/a-little-magic.jpg"
+    },
+    {
+      "id": "hollow-hour",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. literary horror, empty small-town street at 3:17 AM, old radio in a lighted window, shadowy trees and mist, slate and muted rust, atmospheric painterly art. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/hollow-hour.jpg"
+    },
+    {
+      "id": "summer-platform",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. slice of life, two adult women at a flower-filled railway station cafe in summer, soft amber and sage, painterly literary illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/summer-platform.jpg"
+    },
+    {
+      "id": "three-orbits",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. science fiction, three adult travelers on an orbital station observation deck with a vast blue planet beyond, thoughtful and cinematic, muted indigo. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/three-orbits.jpg"
+    },
+    {
+      "id": "ink-and-iron",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. steampunk action webcomic, two adult men one printer and one city guard at a vintage printing press, dramatic gold light and green shadows, detailed polished graphic novel illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/ink-and-iron.jpg"
+    },
+    {
+      "id": "saffron-days",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. cozy comedy, an adult man and adult woman at a cheerful cooking class, copper pots and oranges and saffron flowers, terracotta cream painterly illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/saffron-days.jpg"
+    },
+    {
+      "id": "winter-court",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. historical romance, adult woman carrying a packet of letters approaching a palace in deep snow, powder blue and silver painterly literary illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/winter-court.jpg"
+    },
+    {
+      "id": "ghost-market",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. supernatural webcomic, young adult courier in a lantern-lit night market with friendly translucent ghosts, rich teal and purple polished graphic novel illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/ghost-market.jpg"
+    },
+    {
+      "id": "small-brave-things",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. literary ensemble drama, a townhouse courtyard with plants, laundry, warm lit windows and adult neighbors talking, muted plum and peach painterly art. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/small-brave-things.jpg"
+    },
+    {
+      "id": "tomorrow-bloom",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. fantasy romance, an adult woman botanist and an adult woman traveling witch together in a sprawling magical greenhouse at dawn, sage moss and gold painterly illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/tomorrow-bloom.jpg"
+    },
+    {
+      "id": "city-of-kites",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. adventure webcomic, adult courier on a rooftop over a city floating among clouds with bright paper kites, cream gold and dusky sky blue polished graphic novel illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/city-of-kites.jpg"
+    },
+    {
+      "id": "next-solstice",
+      "prompt": "Original premium portrait book cover illustration, full bleed 2:3 aspect ratio. romance novel, two adult men in long wool coats at a winter lantern festival, snow and warm lanterns, dusky purple and golden amber painterly literary illustration. Richly detailed cohesive editorial bookstore quality, artwork is the focus, quiet darker upper quarter to overlay the title in the app. No text, no lettering, no logo, no watermark. No commercial characters.",
+      "file": "assets/covers/next-solstice.jpg"
+    }
+  ]
+}

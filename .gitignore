@@ -1,0 +1,43 @@
+# Installed dependencies and generated Expo/build output
+node_modules/
+.expo/
+dist/
+web-build/
+coverage/
+.tools/
+.cache/
+*.tsbuildinfo
+expo-env.d.ts
+
+# Local environment configuration; keep only the empty public-variable example
+.env
+.env.*
+!.env.example
+.envrc
+
+# Credentials, private keys, signing material, and local service configuration
+.npmrc
+.netrc
+.aws/
+.ssh/
+.credentials/
+credentials.json
+credentials.*.json
+secrets.json
+secrets.*
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+
+# Local agent state and machine artifacts
+.codex/
+*.log
+.DS_Store
+Thumbs.db

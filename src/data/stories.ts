@@ -1,0 +1,390 @@
+export type Relationship =
+  "BL" | "GL" | "M/F" | "Other" | "Multiple / Poly" | "Non-romance";
+export type Format = "Novel" | "Toon" | "Short Story";
+export type Classification = "Safe" | "Suggestive" | "Erotica" | "Pornographic";
+export type Story = {
+  id: string;
+  title: string;
+  author: string;
+  relationship: Relationship;
+  format: Format;
+  genre: string;
+  classification: Classification;
+  colors: readonly [string, string];
+  motif: string;
+  rating: number;
+  synopsis: string;
+  languages: string[];
+  status: string;
+  tags?: string[];
+  access?: "Free" | "Paid";
+  comingSoon?: boolean;
+};
+export const stories: Story[] = [
+  {
+    id: "moonlit-vow",
+    title: "The Moonlit Vow",
+    author: "Ren Aster",
+    relationship: "BL",
+    format: "Novel",
+    genre: "Fantasy",
+    classification: "Suggestive",
+    colors: ["#624A87", "#17152C"],
+    motif: "☽",
+    rating: 4.9,
+    synopsis:
+      "A royal cartographer who cannot lie. A runaway prince with a stolen name. When a map begins drawing a kingdom that no longer exists, their paths converge beneath a moon that remembers everything. To find their way home, they must decide which promises are worth keeping.",
+    languages: ["English"],
+    status: "Ongoing",
+  },
+  {
+    id: "garden-of-us",
+    title: "A Garden of Us",
+    author: "Mira Sol",
+    relationship: "GL",
+    format: "Novel",
+    genre: "Romance",
+    classification: "Safe",
+    colors: ["#9B656F", "#2B293B"],
+    motif: "✿",
+    rating: 4.8,
+    synopsis:
+      "Two women inherit the same forgotten greenhouse. Through a season of rain, handwritten notes, and unlikely blooms, they learn that starting over can mean growing together.",
+    languages: ["English"],
+    status: "Complete",
+  },
+  {
+    id: "tidebound",
+    title: "Tidebound",
+    author: "Kai Wren",
+    relationship: "BL",
+    format: "Toon",
+    genre: "Adventure",
+    classification: "Safe",
+    colors: ["#267E8A", "#101F39"],
+    motif: "≈",
+    rating: 4.9,
+    synopsis:
+      "A lighthouse keeper and a sea-born traveler follow a trail of vanished stars across an ocean of impossible islands.",
+    languages: ["English"],
+    status: "Ongoing",
+  },
+  {
+    id: "velvet-hours",
+    title: "The Velvet Hours",
+    author: "June Vale",
+    relationship: "GL",
+    format: "Toon",
+    genre: "Romance",
+    classification: "Suggestive",
+    colors: ["#994C89", "#241735"],
+    motif: "✧",
+    rating: 4.7,
+    synopsis:
+      "Behind the curtain of a midnight jazz club, a pianist and a photographer discover the stories a city keeps after dark.",
+    languages: ["English"],
+    status: "Ongoing",
+  },
+  {
+    id: "paper-hearts",
+    title: "Paper Hearts",
+    author: "Ellis Reed",
+    relationship: "M/F",
+    format: "Novel",
+    genre: "Romance",
+    classification: "Safe",
+    colors: ["#BC8663", "#4C2C40"],
+    motif: "♡",
+    rating: 4.6,
+    synopsis:
+      "A bookseller finds a letter inside every returned book. Following the words leads to an unexpected friendship and a love story written in the margins.",
+    languages: ["English"],
+    status: "Complete",
+  },
+  {
+    id: "last-orchard",
+    title: "The Last Orchard",
+    author: "Ash Rowan",
+    relationship: "Non-romance",
+    format: "Short Story",
+    genre: "Fantasy",
+    classification: "Safe",
+    colors: ["#657958", "#182E2F"],
+    motif: "❋",
+    rating: 4.8,
+    synopsis:
+      "At the edge of a city without trees, one gardener tends a small, impossible miracle. A quiet story about memory, community, and what we choose to protect.",
+    languages: ["English"],
+    status: "Complete",
+  },
+  {
+    id: "between-stars",
+    title: "Between Stars",
+    author: "Noa Finch",
+    relationship: "Other",
+    format: "Novel",
+    genre: "Sci-fi",
+    classification: "Safe",
+    colors: ["#6857A5", "#152744"],
+    motif: "✦",
+    rating: 4.7,
+    synopsis:
+      "Three travelers, one broken starship, and a signal from the edge of the universe. Finding a new home begins with finding each other.",
+    languages: ["English"],
+    status: "Ongoing",
+  },
+  {
+    id: "a-little-magic",
+    title: "A Little Magic",
+    author: "Sage Bloom",
+    relationship: "GL",
+    format: "Short Story",
+    genre: "Fantasy",
+    classification: "Safe",
+    colors: ["#B478A9", "#413765"],
+    motif: "✺",
+    rating: 4.8,
+    synopsis:
+      "A spell for lost keys accidentally brings two neighboring witches together. Sometimes the smallest enchantments change everything.",
+    languages: ["English"],
+    status: "Complete",
+  },
+  {
+    id: "house-of-rain",
+    title: "The House That Remembered the Rain",
+    author: "Iris Bell",
+    relationship: "Non-romance",
+    format: "Novel",
+    genre: "Mystery",
+    classification: "Safe",
+    colors: ["#596779", "#1B2939"],
+    motif: "⌂",
+    rating: 4.6,
+    synopsis:
+      "An archivist returns to a coastal house where every room remembers a different version of her childhood.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["gothic", "found family"],
+  },
+  {
+    id: "hollow-hour",
+    title: "The Hollow Hour",
+    author: "Ash Rowan",
+    relationship: "Non-romance",
+    format: "Novel",
+    genre: "Horror",
+    classification: "Suggestive",
+    colors: ["#6F5350", "#271C24"],
+    motif: "◯",
+    rating: 4.5,
+    synopsis:
+      "Every night at 3:17 the town falls silent. Tonight, a radio host decides to keep talking.",
+    languages: ["English"],
+    status: "Complete",
+    tags: ["atmospheric", "small town"],
+  },
+  {
+    id: "summer-platform",
+    title: "Summer at Platform Nine",
+    author: "Mira Sol",
+    relationship: "GL",
+    format: "Short Story",
+    genre: "Slice of Life",
+    classification: "Safe",
+    colors: ["#BF996F", "#445B57"],
+    motif: "☀",
+    rating: 4.8,
+    synopsis:
+      "A station cafe, the last train home, and two women who have been passing one another for years.",
+    languages: ["English"],
+    status: "Complete",
+    tags: ["cozy", "second chances"],
+  },
+  {
+    id: "three-orbits",
+    title: "Three Orbits, One Home",
+    author: "Noa Finch",
+    relationship: "Multiple / Poly",
+    format: "Novel",
+    genre: "Sci-fi",
+    classification: "Safe",
+    colors: ["#686592", "#27384A"],
+    motif: "◎",
+    rating: 4.7,
+    synopsis:
+      "Three adults on a remote station build a home and a relationship while navigating a changing sky.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["found family", "space"],
+  },
+  {
+    id: "ink-and-iron",
+    title: "Ink & Iron",
+    author: "Ren Aster",
+    relationship: "BL",
+    format: "Toon",
+    genre: "Action",
+    classification: "Suggestive",
+    colors: ["#927951", "#253333"],
+    motif: "✶",
+    rating: 4.8,
+    synopsis:
+      "An apprentice printer and a disgraced guard uncover a conspiracy hidden inside the city’s daily paper.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["rivals to allies", "steampunk"],
+  },
+  {
+    id: "saffron-days",
+    title: "Saffron Days",
+    author: "Sage Bloom",
+    relationship: "M/F",
+    format: "Short Story",
+    genre: "Comedy",
+    classification: "Safe",
+    colors: ["#BF8863", "#6B3D44"],
+    motif: "✿",
+    rating: 4.4,
+    synopsis:
+      "A disastrous cooking class brings two neighbors and one very opinionated grandmother together.",
+    languages: ["English"],
+    status: "Complete",
+    tags: ["cozy", "food"],
+  },
+  {
+    id: "winter-court",
+    title: "Letters from the Winter Court",
+    author: "Ellis Reed",
+    relationship: "M/F",
+    format: "Novel",
+    genre: "Historical",
+    classification: "Safe",
+    colors: ["#6F8391", "#2E394D"],
+    motif: "❄",
+    rating: 4.6,
+    synopsis:
+      "A translator discovers that the court’s most ordinary letters conceal a dangerous and tender correspondence.",
+    languages: ["English"],
+    status: "Hiatus",
+    tags: ["letters", "slow burn"],
+  },
+  {
+    id: "ghost-market",
+    title: "The Midnight Ghost Market",
+    author: "June Vale",
+    relationship: "Non-romance",
+    format: "Toon",
+    genre: "Supernatural",
+    classification: "Safe",
+    colors: ["#54776D", "#292346"],
+    motif: "✧",
+    rating: 4.7,
+    synopsis:
+      "At a market that opens only under a new moon, an apprentice trades lost objects for unfinished stories.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["folklore", "ghosts"],
+  },
+  {
+    id: "small-brave-things",
+    title: "A Thousand Small and Unexpectedly Brave Things",
+    author: "Kai Wren",
+    relationship: "Other",
+    format: "Short Story",
+    genre: "Drama",
+    classification: "Safe",
+    colors: ["#8A7189", "#3C354D"],
+    motif: "✺",
+    rating: 4.8,
+    synopsis:
+      "An ensemble of neighbors learns that being brave often begins with asking for help.",
+    languages: ["English"],
+    status: "Complete",
+    tags: ["community", "hope"],
+  },
+  {
+    id: "tomorrow-bloom",
+    title: "Where Tomorrow Blooms",
+    author: "Iris Bell",
+    relationship: "GL",
+    format: "Novel",
+    genre: "Fantasy",
+    classification: "Safe",
+    colors: ["#718369", "#304948"],
+    motif: "❋",
+    rating: 4.6,
+    synopsis:
+      "A botanist and a traveling witch discover a garden that grows possible futures.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["magic", "gentle fantasy"],
+  },
+  {
+    id: "city-of-kites",
+    title: "The City of Paper Kites",
+    author: "Sage Bloom",
+    relationship: "Non-romance",
+    format: "Toon",
+    genre: "Adventure",
+    classification: "Safe",
+    colors: ["#BD9277", "#3D5267"],
+    motif: "◇",
+    rating: 4.5,
+    synopsis:
+      "A courier follows a paper kite into a city that floats above the clouds.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["journey", "sky city"],
+  },
+  {
+    id: "next-solstice",
+    title: "Until the Next Solstice",
+    author: "Ren Aster",
+    relationship: "BL",
+    format: "Novel",
+    genre: "Romance",
+    classification: "Safe",
+    colors: ["#8E6E8B", "#302A46"],
+    motif: "☽",
+    rating: 4.7,
+    synopsis:
+      "Two former pen pals meet at a winter festival and discover that their story has only just begun.",
+    languages: ["English"],
+    status: "Ongoing",
+    tags: ["slow burn", "winter"],
+    comingSoon: true,
+  },
+];
+export const chapterTitles = [
+  "The mapmaker",
+  "A name borrowed",
+  "Silver at the gate",
+  "The quiet road",
+  "An unwritten promise",
+  "Lanterns in the rain",
+  "The hidden shore",
+  "What the moon remembers",
+  "A door of stars",
+  "Letters never sent",
+  "The crossing",
+  "A kingdom of echoes",
+  "The truth between us",
+  "Before the dawn",
+  "A place to begin",
+];
+export function filterStories(
+  query: string,
+  relationship: string,
+  format: string,
+  genre: string,
+) {
+  return stories.filter(
+    (s) =>
+      `${s.title} ${s.author} ${s.genre}`
+        .toLowerCase()
+        .includes(query.trim().toLowerCase()) &&
+      (relationship === "All" || s.relationship === relationship) &&
+      (format === "All" || s.format === format) &&
+      (genre === "All" || s.genre === genre),
+  );
+}
