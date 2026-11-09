@@ -25,7 +25,10 @@ function load(file, dependencies = {}) {
 }
 const data = load("src/data/stories.ts");
 const modeConfig = load("src/config/catalog-mode.ts");
-const policy = load("src/services/discovery-policy.ts");
+const browsing = load("src/theme/browsing.ts");
+const policy = load("src/services/discovery-policy.ts", {
+  "@/theme/browsing": browsing,
+});
 const demoMode = { catalogMode: "demo", demoScenario: "mixed" };
 const catalog = load("src/services/catalog.ts", {
   "@/data/stories": data,
@@ -473,11 +476,15 @@ test("future ranking eligibility never treats demonstration stories as real inve
     trending: false,
   });
 });
-test("responsive result cards fill narrow iPhone widths with balanced gaps", () => {
-  for (const availableWidth of [272, 327, 342, 382]) {
-    const card = policy.responsiveCardWidth(availableWidth, "results");
-    assert.equal(card * 2 + 16, availableWidth);
-    const carousel = policy.responsiveCardWidth(availableWidth, "carousel");
-    assert.ok(carousel >= 112 && carousel <= 192);
+test("shared browsing covers stay compact at 320, 375, 390 and 430pt", () => {
+  assert.equal(browsing.browsingCoverWidth(), 110);
+  assert.equal(browsing.browsingCover.gap, 12);
+  for (const viewport of [320, 375, 390, 430]) {
+    const available = viewport - 48;
+    const card = browsing.browsingCoverWidth(available);
+    assert.ok(card >= 105 && card <= 115);
+    assert.ok(card * 2 + 12 <= available);
+    assert.equal(policy.responsiveCardWidth(available, "carousel"), card);
+    assert.equal(policy.responsiveCardWidth(available, "results"), card);
   }
 });

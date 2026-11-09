@@ -1,3 +1,4 @@
+import { browsingCover } from "@/theme/browsing";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -86,7 +87,7 @@ export function DiscoveryShelf({ section }: { section: DiscoverySection }) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 16, paddingBottom: 5 }}
+        contentContainerStyle={{ gap: browsingCover.gap, paddingBottom: 5 }}
       >
         {section.stories.slice(0, 12).map((story) => (
           <StoryCard key={story.id} story={story} width={cardWidth} />
@@ -104,7 +105,7 @@ export function DiscoveryResults({ stories }: { stories: Story[] }) {
   return (
     <View
       onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-      style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}
+      style={{ flexDirection: "row", flexWrap: "wrap", gap: browsingCover.gap }}
     >
       {stories.map((story) => (
         <StoryCard key={story.id} story={story} width={cardWidth} />

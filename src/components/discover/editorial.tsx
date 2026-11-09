@@ -1,3 +1,4 @@
+import { browsingCover } from "@/theme/browsing";
 import { getStoryReviews, summarizeReviews } from "@/services/story-details";
 import { Pressable, ScrollView, View } from "react-native";
 import { router } from "expo-router";
@@ -109,12 +110,12 @@ export function DoubleCollection({ stories }: { stories: Story[] }) {
                 key={index}
                 style={{
                   flexDirection: "row",
-                  gap: 22,
+                  gap: browsingCover.gap,
                   alignItems: "flex-start",
                 }}
               >
                 {row.map((story) => (
-                  <StoryCard key={story.id} story={story} width={152} />
+                  <StoryCard key={story.id} story={story} />
                 ))}
               </View>
             ),

@@ -1,3 +1,4 @@
+import { browsingCoverWidth } from "@/theme/browsing";
 import type { Story } from "@/data/stories";
 import type { CatalogMode } from "@/config/catalog-mode";
 export type DiscoveryRecord = {
@@ -212,13 +213,7 @@ export function rankingEligibility(
 }
 export function responsiveCardWidth(
   width: number,
-  layout: "carousel" | "results",
+  _layout: "carousel" | "results",
 ) {
-  const available = Math.max(0, width);
-  const gap = 16;
-  const columns =
-    available < 500 ? 2 : Math.max(2, Math.floor((available + gap) / 180));
-  return layout === "results"
-    ? Math.max(1, (available - gap * (columns - 1)) / columns)
-    : Math.min(192, Math.max(112, (available - gap) / 2.12));
+  return browsingCoverWidth(width);
 }

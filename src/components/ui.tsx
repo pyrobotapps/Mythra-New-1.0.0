@@ -8,6 +8,7 @@ import {
   TextProps,
   View,
   ViewStyle,
+  useWindowDimensions,
 } from "react-native";
 import {
   SafeAreaView,
@@ -18,6 +19,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Story } from "@/data/stories";
 import { tokens, useTheme } from "@/theme";
+import { browsingCover, browsingCoverWidth } from "@/theme/browsing";
 import { Glass } from "./glass";
 // Static assets are added by the original cover-art generation workflow.
 import { coverAssets } from "@/data/cover-assets";
@@ -215,7 +217,7 @@ export function Chips({
 }
 export function Cover({
   story,
-  width = 136,
+  width = browsingCover.width,
 }: {
   story: Story;
   width?: number;
@@ -327,13 +329,13 @@ export function Cover({
     </View>
   );
 }
-export function StoryCard({
-  story,
-  width = 136,
-}: {
-  story: Story;
-  width?: number;
-}) {
+export function StoryCard({ story, width }: { story: Story; width?: number }) {
+  const { width: windowWidth } = useWindowDimensions();
+  const cardWidth =
+    width ??
+    browsingCoverWidth(
+      Math.min(tokens.maxWidth, windowWidth) - tokens.gutter * 2,
+    );
   return (
     <Pressable
       accessibilityRole="button"
@@ -341,9 +343,13 @@ export function StoryCard({
       onPress={() =>
         router.push({ pathname: "/story/[id]", params: { id: story.id } })
       }
-      style={({ pressed }) => ({ width, gap: 7, opacity: pressed ? 0.7 : 1 })}
+      style={({ pressed }) => ({
+        width: cardWidth,
+        gap: 7,
+        opacity: pressed ? 0.7 : 1,
+      })}
     >
-      <Cover story={story} width={width} />
+      <Cover story={story} width={cardWidth} />
       <Txt style={{ fontSize: 14, lineHeight: 19, fontWeight: "600" }}>
         {story.title}
       </Txt>
@@ -402,7 +408,7 @@ export function Shelf({
   stories,
   collectionKey,
   twoRows = false,
-  width = 136,
+  width,
 }: {
   title: string;
   subtitle?: string;
@@ -429,7 +435,7 @@ export function Shelf({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 18, paddingBottom: 6 }}
+        contentContainerStyle={{ gap: browsingCover.gap, paddingBottom: 6 }}
       >
         {twoRows ? (
           <View style={{ gap: 24 }}>
@@ -438,7 +444,7 @@ export function Shelf({
                 key={i}
                 style={{
                   flexDirection: "row",
-                  gap: 18,
+                  gap: browsingCover.gap,
                   alignItems: "flex-start",
                 }}
               >
@@ -465,5 +471,5 @@ export function DemoNote() {
 }
 export const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 16 },
-  wrap: { flexDirection: "row", flexWrap: "wrap", gap: 18 },
+  wrap: { flexDirection: "row", flexWrap: "wrap", gap: browsingCover.gap },
 });
