@@ -6,7 +6,13 @@ import { tokens, useTheme } from "@/theme";
 import { Cover, SectionHeading, Txt, styles } from "./ui";
 import { Glass, IconButton } from "./glass";
 import { Icon } from "./icon";
-export function StoreHeader({ title }: { title?: string }) {
+export function StoreHeader({
+  title,
+  showSearch = true,
+}: {
+  title?: string;
+  showSearch?: boolean;
+}) {
   const { theme } = useTheme();
   return (
     <View style={[styles.row, { justifyContent: "space-between" }]}>
@@ -27,13 +33,20 @@ export function StoreHeader({ title }: { title?: string }) {
         </Txt>
       </View>
       <View style={{ flexDirection: "row", gap: 8 }}>
-        <IconButton
-          name="search"
-          label="Search bookstore"
-          onPress={() =>
-            router.navigate({ pathname: "/discover", params: { search: "1" } })
-          }
-        />
+        {showSearch ? (
+          <>
+            <IconButton
+              name="search"
+              label="Search bookstore"
+              onPress={() =>
+                router.navigate({
+                  pathname: "/discover",
+                  params: { search: "1" },
+                })
+              }
+            />
+          </>
+        ) : null}
         <IconButton
           name="bell"
           label="Open notifications"
@@ -155,6 +168,7 @@ export function ChartRow({
   );
 }
 export function ChartShelf({ stories }: { stories: Story[] }) {
+  if (!stories.length) return null;
   const pages = Array.from({ length: Math.ceil(stories.length / 3) }, (_, i) =>
     stories.slice(i * 3, i * 3 + 3),
   );
@@ -181,8 +195,9 @@ export function ChartShelf({ stories }: { stories: Story[] }) {
     </View>
   );
 }
-export function EditorialFeature({ story }: { story: Story }) {
+export function EditorialFeature({ story }: { story: Story | undefined }) {
   const { theme, id } = useTheme();
+  if (!story) return null;
   return (
     <View style={{ gap: 14 }}>
       <SectionHeading

@@ -2,6 +2,10 @@
 
 An iPhone-first Expo SDK 58 / React Native / TypeScript reading and publishing app. The existing project has been rebuilt for **Phase 1 — Visual Foundation**. Later phases remain intentionally unfinished. The complete [master specification](docs/master-specification.md) is preserved for subsequent phases.
 
+## Current Discover behavior
+
+Discover now uses GL/BL and genre-led shelves, a single search bar, an Apply/Clear filter panel, responsive results, and explicit empty/error states. See [the discovery system and production safeguards](docs/discovery-system.md). Demo data is opt-in with `EXPO_PUBLIC_CATALOG_MODE=demo` and is blocked in release builds. A production discovery adapter is not connected; this is reported as an error rather than an empty catalog or a demo fallback.
+
 ## Preview in Expo Go
 
 From this project folder:

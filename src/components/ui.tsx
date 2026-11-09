@@ -1,3 +1,4 @@
+import { catalogMode } from "@/config/catalog-mode";
 import React from "react";
 import {
   Pressable,
@@ -410,6 +411,7 @@ export function Shelf({
   twoRows?: boolean;
   width?: number;
 }) {
+  if (!stories.length) return null;
   const seeAll = () =>
     router.push({
       pathname: "/collection/[key]",
@@ -454,6 +456,7 @@ export function Shelf({
   );
 }
 export function DemoNote() {
+  if (catalogMode !== "demo") return null;
   return (
     <Txt muted style={{ fontSize: 10, lineHeight: 15, letterSpacing: 0.35 }}>
       DEMO BOOKSTORE · Fictional catalog, ratings & editorial rankings

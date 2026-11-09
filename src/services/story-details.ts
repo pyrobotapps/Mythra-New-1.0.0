@@ -1,3 +1,4 @@
+import { catalogMode } from "@/config/catalog-mode";
 import { chapterTitles, Story } from "@/data/stories";
 export type PreviewChapter = {
   id: string;
@@ -24,6 +25,7 @@ export function getPreviewChapters(
   storyId: string,
   language = "English",
 ): PreviewChapter[] {
+  if (catalogMode !== "demo") return [];
   return [...chapterTitles, ...extraTitles].map((title, index) => ({
     id: `${storyId}:${language}:${index + 1}`,
     edition: language,
@@ -105,7 +107,7 @@ const reviewsByStory: Readonly<Record<string, readonly PreviewReview[]>> = {
   ],
 };
 export function getStoryReviews(storyId: string): readonly PreviewReview[] {
-  return reviewsByStory[storyId] ?? [];
+  return catalogMode === "demo" ? (reviewsByStory[storyId] ?? []) : [];
 }
 export function summarizeReviews(reviews: readonly PreviewReview[]) {
   const spiceRatings = reviews.flatMap((review) =>

@@ -1,3 +1,5 @@
+import { catalogMode } from "@/config/catalog-mode";
+import { mobileClassificationAllowed } from "@/services/discovery-policy";
 import { stories, Story } from "@/data/stories";
 export const relationships = [
   "BL",
@@ -44,7 +46,7 @@ export const emptyFilters: CatalogFilters = {
   access: "All",
 };
 /** This distribution's demo catalog includes no explicit material. Never treat a local toggle as an entitlement. */
-export const visibleStories = stories.filter(
+export const visibleStories = (catalogMode === "demo" ? stories : []).filter(
   (s) => s.classification !== "Pornographic" && s.classification !== "Erotica",
 );
 export function searchCatalog(
@@ -53,6 +55,7 @@ export function searchCatalog(
 ) {
   const q = filters.query.trim().toLocaleLowerCase();
   return source.filter((s) => {
+    if (!mobileClassificationAllowed(s.classification)) return false;
     const haystack = [
       s.title,
       s.author,
@@ -94,6 +97,8 @@ export type Collection = {
 const ids = (fn: (s: Story) => boolean) =>
   visibleStories.filter(fn).map((s) => s.id);
 const all = visibleStories.map((s) => s.id);
+const picked = (...indices: number[]) =>
+  indices.flatMap((index) => (all[index] ? [all[index]] : []));
 export const collections: Collection[] = [
   {
     key: "featured",
@@ -112,7 +117,7 @@ export const collections: Collection[] = [
     key: "picks",
     title: "Top Picks for You",
     subtitle: "A little wonder, a little escape · Demo picks",
-    ids: [all[1], all[8], all[6], all[16], all[5]],
+    ids: picked(1, 8, 6, 16, 5),
   },
   {
     key: "new",
@@ -179,13 +184,13 @@ export const collections: Collection[] = [
     key: "editors",
     title: "Editor’s Picks",
     subtitle: "Chosen for the demonstration bookstore",
-    ids: [all[8], all[5], all[1], all[11]],
+    ids: picked(8, 5, 1, 11),
   },
   {
     key: "gems",
     title: "Hidden Gems",
     subtitle: "Take a chance on something different",
-    ids: [all[9], all[16], all[13], all[14]],
+    ids: picked(9, 16, 13, 14),
   },
   {
     key: "soon",

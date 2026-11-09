@@ -1,3 +1,4 @@
+import { plannedLanguages } from "@/models/catalog";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
@@ -56,7 +57,11 @@ export function CatalogPreferencesProvider({ children }: PropsWithChildren) {
           ].includes(value.classification)
             ? value.classification
             : "All",
-          language: value.language === "English" ? "English" : "All",
+          language: plannedLanguages.some(
+            (language) => language.label === value.language,
+          )
+            ? value.language
+            : "All",
           status: ["All", "Complete", "Ongoing", "Hiatus"].includes(
             value.status,
           )

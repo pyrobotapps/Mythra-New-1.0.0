@@ -3,40 +3,66 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Chip, Chips, Txt } from "./ui";
 import { IconButton } from "./glass";
 import {
-  CatalogFilters,
-  emptyFilters,
+  type CatalogFilters,
   formats,
-  genres,
-  relationships,
   toggleSelection,
 } from "@/services/catalog";
+import { plannedLanguages } from "@/models/catalog";
 import { useTheme } from "@/theme";
-export function MultiSelect({
+const relationshipOptions = [
+  { label: "Boys Love", value: "BL" },
+  { label: "Girls Love", value: "GL" },
+  { label: "M/F", value: "M/F" },
+  { label: "Multiple / Poly", value: "Multiple / Poly" },
+  { label: "Other", value: "Other" },
+  { label: "No Romance", value: "Non-romance" },
+];
+const genreOptions = [
+  "Romance",
+  "Fantasy",
+  "Horror",
+  "Action",
+  "Adventure",
+  "Mystery",
+  "Thriller",
+  "Sci-fi",
+  "Slice of Life",
+  "Historical",
+  "Drama",
+  "Comedy",
+  "Supernatural",
+].map((value) => ({ value, label: value === "Sci-fi" ? "Sci-Fi" : value }));
+function MultiSelect({
   label,
-  values,
+  options,
   selected,
   onChange,
 }: {
   label: string;
-  values: readonly string[];
+  options: readonly { label: string; value: string }[];
   selected: string[];
-  onChange: (v: string[]) => void;
+  onChange: (values: string[]) => void;
 }) {
   return (
-    <View style={{ gap: 10 }}>
-      <Txt style={{ fontWeight: "600" }}>{label}</Txt>
+    <View style={{ gap: 12 }}>
+      <Txt
+        accessibilityRole="header"
+        style={{ fontSize: 16, fontWeight: "600" }}
+      >
+        {label}
+      </Txt>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         <Chip
-          label="All"
+          label="Any"
           active={!selected.length}
           onPress={() => onChange([])}
         />
-        {values.map((v) => (
+        {options.map((option) => (
           <Chip
-            key={v}
-            label={v}
-            active={selected.includes(v)}
-            onPress={() => onChange(toggleSelection(selected, v))}
+            key={option.value}
+            label={option.label}
+            active={selected.includes(option.value)}
+            onPress={() => onChange(toggleSelection(selected, option.value))}
           />
         ))}
       </View>
@@ -48,12 +74,16 @@ export function FilterSheet({
   onClose,
   filters,
   onChange,
+  onApply,
+  onClear,
   count,
 }: {
   visible: boolean;
   onClose: () => void;
   filters: CatalogFilters;
-  onChange: (f: CatalogFilters) => void;
+  onChange: (value: CatalogFilters) => void;
+  onApply: () => void;
+  onClear: () => void;
   count: number;
 }) {
   const { theme } = useTheme();
@@ -69,85 +99,95 @@ export function FilterSheet({
           style={{
             padding: 20,
             flexDirection: "row",
-            justifyContent: "space-between",
             alignItems: "center",
+            gap: 12,
           }}
         >
-          <Txt title>Refine your shelves</Txt>
+          <Txt title style={{ flex: 1, fontSize: 26 }}>
+            Find your story
+          </Txt>
           <IconButton name="close" label="Close filters" onPress={onClose} />
         </View>
         <ScrollView
-          contentContainerStyle={{ padding: 20, gap: 26, paddingBottom: 40 }}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ padding: 20, gap: 28, paddingBottom: 32 }}
         >
-          <Txt muted style={{ fontSize: 12 }}>
-            Choose several preferences or browse everything. Changes apply
-            immediately and are saved on this device.
+          <Txt muted style={{ fontSize: 12, lineHeight: 20 }}>
+            Choose one or several preferences. Apply when you’re ready.
           </Txt>
           <MultiSelect
-            label="Format"
-            values={formats}
-            selected={filters.formats}
-            onChange={(v) => onChange({ ...filters, formats: v })}
-          />
-          <MultiSelect
-            label="Literary genres"
-            values={genres}
-            selected={filters.genres}
-            onChange={(v) => onChange({ ...filters, genres: v })}
-          />
-          <MultiSelect
-            label="Relationship categories"
-            values={relationships}
+            label="Relationships"
+            options={relationshipOptions}
             selected={filters.relationships}
-            onChange={(v) => onChange({ ...filters, relationships: v })}
+            onChange={(relationships) =>
+              onChange({ ...filters, relationships })
+            }
+          />
+          <MultiSelect
+            label="Genres"
+            options={genreOptions}
+            selected={filters.genres}
+            onChange={(genres) => onChange({ ...filters, genres })}
+          />
+          <MultiSelect
+            label="Story format"
+            options={formats.map((value) => ({ label: value, value }))}
+            selected={filters.formats}
+            onChange={(formats) => onChange({ ...filters, formats })}
           />
           {(
             [
+              [
+                "Reading language",
+                "language",
+                ["All", ...plannedLanguages.map((language) => language.label)],
+              ],
               [
                 "Content classification",
                 "classification",
                 ["All", "Safe", "Suggestive", "Erotica", "Pornographic"],
               ],
-              ["Available reading language", "language", ["All", "English"]],
               [
-                "Publication status",
+                "Completion status",
                 "status",
                 ["All", "Ongoing", "Complete", "Hiatus"],
               ],
-              ["Access", "access", ["All", "Free", "Paid"]],
+              ["Access type", "access", ["All", "Free", "Paid"]],
             ] as const
           ).map(([label, key, values]) => (
-            <View key={key} style={{ gap: 10 }}>
-              <Txt style={{ fontWeight: "600" }}>{label}</Txt>
+            <View key={key} style={{ gap: 12 }}>
+              <Txt style={{ fontSize: 16, fontWeight: "600" }}>{label}</Txt>
               <Chips
                 values={values}
                 value={filters[key]}
-                onChange={(v) => onChange({ ...filters, [key]: v })}
+                onChange={(value) => onChange({ ...filters, [key]: value })}
               />
             </View>
           ))}
-          <Txt muted style={{ fontSize: 12 }}>
-            Only English editions exist in this demo. All sample stories are
-            free. Explicit material is excluded from this mobile catalog;
-            classification filters do not unlock content.
+          <Txt muted style={{ fontSize: 12, lineHeight: 19 }}>
+            Filters only narrow available editions. They never unlock restricted
+            material. Explicit content is excluded from this mobile catalog.
           </Txt>
-          <Button
-            secondary
-            label="Reset all filters"
-            onPress={() => onChange({ ...emptyFilters, query: filters.query })}
-          />
         </ScrollView>
         <View
           style={{
             padding: 20,
+            gap: 12,
             borderTopWidth: 1,
             borderColor: theme.accent + "20",
           }}
         >
-          <Button
-            label={`Show ${count} ${count === 1 ? "story" : "stories"}`}
-            onPress={onClose}
-          />
+          <Txt muted style={{ fontSize: 11 }}>
+            {count} matching {count === 1 ? "story" : "stories"}
+          </Txt>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <View style={{ flex: 1 }}>
+              <Button secondary label="Clear Filters" onPress={onClear} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button label="Apply Filters" onPress={onApply} />
+            </View>
+          </View>
         </View>
       </SafeAreaView>
     </Modal>

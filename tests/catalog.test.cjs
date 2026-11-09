@@ -24,7 +24,14 @@ function load(file, dependencies = {}) {
   return mod.exports;
 }
 const data = load("src/data/stories.ts");
-const catalog = load("src/services/catalog.ts", { "@/data/stories": data });
+const modeConfig = load("src/config/catalog-mode.ts");
+const policy = load("src/services/discovery-policy.ts");
+const demoMode = { catalogMode: "demo", demoScenario: "mixed" };
+const catalog = load("src/services/catalog.ts", {
+  "@/data/stories": data,
+  "@/config/catalog-mode": demoMode,
+  "@/services/discovery-policy": policy,
+});
 const find = (updates) =>
   catalog.searchCatalog({ ...catalog.emptyFilters, ...updates });
 test("catalog and collection references are unique and valid", () => {
@@ -133,6 +140,7 @@ test("planned languages retain distinct Unicode labels without inventing edition
 
 const details = load("src/services/story-details.ts", {
   "@/data/stories": data,
+  "@/config/catalog-mode": demoMode,
 });
 test("story details begins with 15 newest chapters and can reverse the order without mutating data", () => {
   const chapters = details.getPreviewChapters("moonlit-vow");
@@ -224,4 +232,252 @@ test("chart previews include up to five released books of each selected format",
     );
   }
   assert.deepEqual(catalog.chartPreview("unknown"), []);
+});
+
+const source = load("src/services/discovery-source.ts", {
+  "@/data/stories": data,
+  "@/config/catalog-mode": demoMode,
+  "./discovery-policy": policy,
+});
+const now = Date.parse("2026-11-07T12:00:00Z");
+const demoRecords = source.demoDiscoveryRecords(now);
+const toProduction = (record) => ({ ...record, source: "production" });
+const productionRecords = demoRecords.map(toProduction);
+test("release builds reject demo mode even when the public environment requests it", () => {
+  for (const requested of [undefined, "demo", "production", "anything"])
+    assert.equal(modeConfig.resolveCatalogMode(false, requested), "production");
+  assert.equal(modeConfig.resolveCatalogMode(true, undefined), "production");
+  assert.equal(modeConfig.resolveCatalogMode(true, "demo"), "demo");
+  assert.equal(modeConfig.resolveCatalogMode(true, "production"), "production");
+  const releaseCatalog = load("src/services/catalog.ts", {
+    "@/data/stories": data,
+    "@/config/catalog-mode": { catalogMode: "production" },
+    "@/services/discovery-policy": policy,
+  });
+  assert.equal(releaseCatalog.visibleStories.length, 0);
+  assert.equal(
+    releaseCatalog.searchCatalog(releaseCatalog.emptyFilters).length,
+    0,
+  );
+  assert.equal(releaseCatalog.chartPreview("Novel").length, 0);
+  const releaseDetails = load("src/services/story-details.ts", {
+    "@/data/stories": data,
+    "@/config/catalog-mode": { catalogMode: "production" },
+  });
+  assert.deepEqual(releaseDetails.getStoryReviews("moonlit-vow"), []);
+  assert.deepEqual(releaseDetails.getPreviewChapters("moonlit-vow"), []);
+  assert.deepEqual(policy.eligibleCatalog(demoRecords, "production", now), {
+    published: [],
+    upcoming: [],
+  });
+});
+test("production adapter success with zero stories is distinct from absence or failure", async () => {
+  const empty = await source.createDiscoveryLoader({
+    mode: "production",
+    loadPublished: async () => [],
+    now: () => now,
+  })();
+  assert.equal(empty.mode, "production");
+  assert.deepEqual(empty.catalog, { published: [], upcoming: [] });
+  await assert.rejects(
+    source.createDiscoveryLoader({ mode: "production" })(),
+    /not connected/,
+  );
+  await assert.rejects(
+    source.createDiscoveryLoader({
+      mode: "production",
+      loadPublished: async () => {
+        throw new Error("Network failed");
+      },
+    })(),
+    /Network failed/,
+  );
+  const rejectedDemos = await source.createDiscoveryLoader({
+    mode: "production",
+    loadPublished: async () => demoRecords,
+    now: () => now,
+  })();
+  assert.equal(rejectedDemos.catalog.published.length, 0);
+});
+test("zero, GL-only, BL-only, mixed and failed development catalogs have honest states", async () => {
+  for (const scenario of ["empty", "gl-only", "bl-only", "mixed"]) {
+    const result = await source.createDiscoveryLoader({
+      mode: "demo",
+      scenario,
+      now: () => now,
+    })();
+    const sections = policy.buildDiscoverySections(result.catalog, now);
+    assert.ok(sections.every((section) => section.stories.length > 0));
+    assert.ok(
+      sections.every(
+        (section) => !/(top|popular|trending)/i.test(section.title),
+      ),
+    );
+    if (scenario === "empty") assert.deepEqual(sections, []);
+    if (scenario === "gl-only") {
+      assert.ok(sections.some((section) => section.key === "gl"));
+      assert.ok(!sections.some((section) => section.key === "bl"));
+    }
+    if (scenario === "bl-only") {
+      assert.ok(sections.some((section) => section.key === "bl"));
+      assert.ok(!sections.some((section) => section.key === "gl"));
+    }
+    if (scenario === "mixed")
+      assert.deepEqual(
+        sections.slice(0, 2).map((section) => section.key),
+        ["gl", "bl"],
+      );
+  }
+  await assert.rejects(
+    source.createDiscoveryLoader({ mode: "demo", scenario: "error" })(),
+    /could not be loaded/,
+  );
+});
+test("eligibility requires approved mobile-safe publication or an explicit approved schedule", () => {
+  const base = productionRecords.find(
+    (record) => record.publicationState === "published",
+  );
+  const invalid = [
+    { ...base, approved: false },
+    { ...base, visibility: "private" },
+    { ...base, mobileEligible: false },
+    { ...base, creator: { ...base.creator, approved: false } },
+    { ...base, publicationState: "draft" },
+    { ...base, publishedAt: new Date(now + 1).toISOString() },
+    { ...base, publishedAt: null },
+    { ...base, publishedChapterCount: 0 },
+    { ...base, story: { ...base.story, classification: "Pornographic" } },
+    { ...base, story: { ...base.story, classification: "Erotica" } },
+  ];
+  assert.equal(
+    policy.eligibleCatalog(invalid, "production", now).published.length,
+    0,
+  );
+  assert.equal(
+    policy.eligibleCatalog([base], "production", now).published.length,
+    1,
+  );
+  const upcoming = productionRecords.find(
+    (record) => record.publicationState === "scheduled",
+  );
+  assert.equal(
+    policy.eligibleCatalog([upcoming], "production", now).upcoming.length,
+    1,
+  );
+  assert.equal(
+    policy.eligibleCatalog(
+      [{ ...upcoming, scheduledAt: null }],
+      "production",
+      now,
+    ).upcoming.length,
+    0,
+  );
+  assert.equal(
+    catalog.searchCatalog(
+      { ...catalog.emptyFilters, classification: "Pornographic" },
+      [{ ...base.story, classification: "Pornographic" }],
+    ).length,
+    0,
+  );
+});
+test("updated, completed and new-creator shelves require corresponding publication evidence", () => {
+  const base = productionRecords.find(
+    (record) => record.publicationState === "published",
+  );
+  const catalogWithNoSignals = policy.eligibleCatalog(
+    [
+      {
+        ...base,
+        lastChapterPublishedAt: null,
+        completedAt: null,
+        story: { ...base.story, status: "Complete" },
+        creator: { ...base.creator, firstPublishedAt: null },
+      },
+    ],
+    "production",
+    now,
+  );
+  const keys = policy
+    .buildDiscoverySections(catalogWithNoSignals, now)
+    .map((section) => section.key);
+  assert.ok(keys.includes("new"));
+  for (const key of ["updated", "completed", "creators", "soon"])
+    assert.ok(!keys.includes(key));
+  const catalogWithSignals = policy.eligibleCatalog(
+    [
+      {
+        ...base,
+        lastChapterPublishedAt: new Date(now - 1000).toISOString(),
+        completedAt: new Date(now - 1000).toISOString(),
+        story: { ...base.story, status: "Complete" },
+      },
+    ],
+    "production",
+    now,
+  );
+  const populated = policy
+    .buildDiscoverySections(catalogWithSignals, now)
+    .map((section) => section.key);
+  for (const key of ["updated", "completed", "creators"])
+    assert.ok(populated.includes(key));
+});
+test("genre shelves and future ranking capabilities follow configurable genuine-data thresholds", () => {
+  const eligible = policy.eligibleCatalog(productionRecords, "production", now);
+  assert.deepEqual(policy.rankingEligibility(eligible, null), {
+    top10: false,
+    popular: false,
+    trending: false,
+  });
+  const reliable = {
+    verified: true,
+    rankedStoryIds: eligible.published.map((record) => record.story.id),
+    uniqueReaders: 100,
+    engagementEvents: 1000,
+  };
+  assert.equal(policy.rankingEligibility(eligible, reliable).top10, true);
+  assert.equal(
+    policy.rankingEligibility(
+      { ...eligible, published: eligible.published.slice(0, 9) },
+      reliable,
+    ).top10,
+    false,
+  );
+  assert.equal(
+    policy.rankingEligibility(eligible, { ...reliable, verified: false })
+      .popular,
+    false,
+  );
+  assert.equal(
+    policy.rankingEligibility(eligible, { ...reliable, engagementEvents: 0 })
+      .trending,
+    false,
+  );
+  const thresholds = { ...policy.discoveryThresholds, genreShelfStories: 100 };
+  assert.ok(
+    !policy
+      .buildDiscoverySections(eligible, now, thresholds)
+      .some((section) => section.key.startsWith("genre:")),
+  );
+});
+test("future ranking eligibility never treats demonstration stories as real inventory", () => {
+  const demo = policy.eligibleCatalog(demoRecords, "demo", now);
+  const signals = {
+    verified: true,
+    rankedStoryIds: demo.published.map((record) => record.story.id),
+    uniqueReaders: 10000,
+    engagementEvents: 10000,
+  };
+  assert.deepEqual(policy.rankingEligibility(demo, signals), {
+    top10: false,
+    popular: false,
+    trending: false,
+  });
+});
+test("responsive result cards fill narrow iPhone widths with balanced gaps", () => {
+  for (const availableWidth of [272, 327, 342, 382]) {
+    const card = policy.responsiveCardWidth(availableWidth, "results");
+    assert.equal(card * 2 + 16, availableWidth);
+    const carousel = policy.responsiveCardWidth(availableWidth, "carousel");
+    assert.ok(carousel >= 112 && carousel <= 192);
+  }
 });
