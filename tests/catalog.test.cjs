@@ -488,3 +488,180 @@ test("shared browsing covers stay compact at 320, 375, 390 and 430pt", () => {
     assert.equal(policy.responsiveCardWidth(available, "results"), card);
   }
 });
+
+const authorPreview = load("src/data/author-preview.ts", {
+  "@/config/catalog-mode": demoMode,
+});
+const home = load("src/services/home-editorial.ts", {
+  "@/data/author-preview": authorPreview,
+  "./discovery-policy": policy,
+});
+test("Home editorial never admits drafts, restricted, unapproved or demo production records", () => {
+  const records = source.demoDiscoveryRecords();
+  const mixed = { published: records, upcoming: records };
+  const selected = home.homeEditorial(mixed, "demo");
+  const eligible = policy.eligibleCatalog(records, "demo").published;
+  assert.deepEqual(
+    selected.next.map((s) => s.id),
+    eligible.map((r) => r.story.id),
+  );
+  assert.equal(
+    new Set(selected.authors.map((s) => s.id)).size,
+    selected.authors.length,
+  );
+  assert.ok(selected.authors.length >= 5);
+  assert.deepEqual(home.homeEditorial(mixed, "production"), {
+    next: [],
+    authors: [],
+  });
+  for (const patch of [
+    { approved: false },
+    { visibility: "private" },
+    { mobileEligible: false },
+    { publicationState: "draft" },
+    { publishedChapterCount: 0 },
+  ]) {
+    assert.equal(
+      home.homeEditorial(
+        { published: [{ ...eligible[0], ...patch }], upcoming: [] },
+        "demo",
+      ).next.length,
+      0,
+    );
+  }
+});
+test("Home editorial handles zero and limited story selections without invented books", () => {
+  const records = policy.eligibleCatalog(
+    source.demoDiscoveryRecords(),
+    "demo",
+  ).published;
+  for (let count = 0; count <= 5; count++) {
+    const selected = home.homeEditorial(
+      { published: records.slice(0, count), upcoming: [] },
+      "demo",
+    );
+    assert.equal(selected.next.length, count);
+    assert.equal(selected.authors.length, count);
+  }
+});
+test("editorial artwork fits 320, 375, 390 and 430pt without touching headings", () => {
+  for (const viewport of [320, 375, 390, 430]) {
+    const width = viewport - 48;
+    for (let count = 1; count <= 5; count++) {
+      const g = home.editorialGeometry(width, count);
+      assert.ok(g.fanLeft >= 20 - 0.001);
+      assert.ok(
+        g.fanLeft + g.fanStep * (count - 1) + g.fanCover <= width - 20 + 0.001,
+      );
+      assert.ok(
+        8 + Math.abs((count - 1) / 2) * 9 + g.fanCover * 1.5 <= g.fanHeight,
+      );
+      assert.equal(g.large + 16 + g.small * 2 + 8, width);
+    }
+  }
+});
+
+test("author blocks use creator IDs and never fill slots with another creator", () => {
+  const records = policy.eligibleCatalog(
+    source.demoDiscoveryRecords(),
+    "demo",
+  ).published;
+  const groups = home.authorCollections(
+    { published: records, upcoming: [] },
+    "demo",
+  );
+  assert.equal(groups[0].preview, true);
+  assert.equal(groups[0].stories.length, 5);
+  for (const group of groups.filter((g) => !g.preview)) {
+    assert.ok(
+      group.stories.every(
+        (s) => records.find((r) => r.story.id === s.id).creator.id === group.id,
+      ),
+    );
+    assert.equal(
+      new Set(group.stories.map((s) => s.id)).size,
+      group.stories.length,
+    );
+  }
+  const sameNames = records.slice(0, 2).map((r, i) => ({
+    ...r,
+    creator: { ...r.creator, id: `id-${i}`, name: "Same name" },
+  }));
+  assert.equal(
+    home
+      .authorCollections({ published: sameNames, upcoming: [] }, "demo")
+      .filter((g) => !g.preview).length,
+    2,
+  );
+  assert.deepEqual(
+    home.authorCollections({ published: [], upcoming: [] }, "demo"),
+    [],
+  );
+  assert.deepEqual(authorPreview.authorPreviewBooks("production"), []);
+  const releasePreview = load("src/data/author-preview.ts", {
+    "@/config/catalog-mode": { catalogMode: "production" },
+  });
+  assert.deepEqual(releasePreview.authorPreviewBooks("demo"), []);
+});
+test("five-book author blocks exactly align portrait cover edges at all requested widths", () => {
+  for (const viewport of [320, 375, 390, 430]) {
+    const width = viewport - 48;
+    const g = home.authorGeometry(width);
+    assert.ok(Math.abs(g.large + g.gap + 2 * g.small + g.gap - width) < 0.0001);
+    assert.ok(Math.abs(g.large * 1.5 - (2 * g.small * 1.5 + g.gap)) < 0.0001);
+    assert.equal(g.gap, 8);
+  }
+});
+
+test("author carousel keeps one complete showcase per interval at every requested width", () => {
+  for (const viewport of [320, 375, 390, 430]) {
+    const available = viewport - 48;
+    const g = home.authorCarouselGeometry(available);
+    assert.equal(g.itemWidth + 18, available);
+    assert.equal(g.interval, g.itemWidth + 12);
+    assert.equal(g.innerWidth + 22, g.itemWidth);
+    const c = g.covers;
+    assert.ok(
+      Math.abs(c.large + c.gap + 2 * c.small + c.gap - g.innerWidth) < 0.0001,
+    );
+    assert.ok(Math.abs(c.height - (2 * c.small * 1.5 + c.gap)) < 0.0001);
+    assert.ok(g.itemHeight >= c.height + 27 + 15 + 22 + 8);
+  }
+});
+
+test("one through five-plus books preserve identical five-slot author cards", () => {
+  const stories = authorPreview.authorPreviewBooks("demo");
+  for (const viewport of [320, 375, 390, 430]) {
+    const available = viewport - 48;
+    const baseline = home
+      .authorShowcaseSlots(stories, available)
+      .map(({ story, ...rect }) => rect);
+    const layout = home.authorCarouselGeometry(available);
+    for (const count of [1, 2, 3, 4, 5, 6]) {
+      const works =
+        count === 6
+          ? [...stories, { ...stories[0], id: "test-sixth-work" }]
+          : stories.slice(0, count);
+      const slots = home.authorShowcaseSlots(works, available);
+      assert.equal(slots.length, 5);
+      assert.deepEqual(
+        slots.map(({ story, ...rect }) => rect),
+        baseline,
+      );
+      assert.deepEqual(
+        slots.filter((s) => s.story).map((s) => s.story.id),
+        works.slice(0, 5).map((s) => s.id),
+      );
+      for (const slot of slots) {
+        assert.ok(slot.x >= 0 && slot.y >= 0);
+        assert.ok(slot.x + slot.width <= layout.innerWidth + 0.001);
+        assert.ok(slot.y + slot.height <= layout.covers.height + 0.001);
+      }
+      assert.equal(slots[0].y, slots[1].y);
+      assert.ok(
+        Math.abs(slots[0].height - (slots[4].y + slots[4].height)) < 0.001,
+      );
+    }
+    assert.ok(Math.abs(layout.itemHeight - layout.covers.height - 72) < 0.001);
+  }
+});

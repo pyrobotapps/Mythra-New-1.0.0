@@ -1,3 +1,6 @@
+import { NextRead, BooksByAuthors } from "@/components/home/editorial";
+import { useDiscovery } from "@/hooks/use-discovery";
+import { authorCollections, homeEditorial } from "@/services/home-editorial";
 import { View } from "react-native";
 import { router } from "expo-router";
 import {
@@ -34,6 +37,11 @@ const homeKeys = [
 ];
 export default function Home() {
   const { theme } = useTheme();
+  const { state } = useDiscovery();
+  const editorial =
+    state.status === "ready"
+      ? homeEditorial(state.data.catalog, state.data.mode)
+      : null;
   return (
     <Page>
       <StoreHeader />
@@ -65,7 +73,17 @@ export default function Home() {
           </View>
         </View>
       </View>
+      {editorial ? <NextRead stories={editorial.next} /> : null}
       <EditorialFeature story={visibleStories[0]} />
+      {editorial ? (
+        <BooksByAuthors
+          collections={
+            state.status === "ready"
+              ? authorCollections(state.data.catalog, state.data.mode)
+              : []
+          }
+        />
+      ) : null}
       <ChartShelf stories={collectionStories("charts")} />
       {homeKeys.map((key) => {
         const c = collections.find((c) => c.key === key)!;

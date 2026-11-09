@@ -1,3 +1,4 @@
+import { findAuthorPreview } from "@/data/author-preview";
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import * as Linking from "expo-linking";
@@ -597,7 +598,9 @@ function StoryContent({ story }: { story: Story }) {
 }
 export default function StoryDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const story = visibleStories.find((s) => s.id === id);
+  const story =
+    visibleStories.find((s) => s.id === id) ??
+    findAuthorPreview(typeof id === "string" ? id : undefined);
   if (!story)
     return (
       <Page>
