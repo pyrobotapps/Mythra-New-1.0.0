@@ -146,7 +146,7 @@ function StoryContent({ story }: { story: Story }) {
               accessibilityLabel={`About ${story.author}`}
               onPress={() => setDialog("creator")}
             >
-              <Txt muted style={{ fontSize: 12, lineHeight: 18 }}>
+              <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
                 by {story.author}
               </Txt>
             </Pressable>
@@ -324,7 +324,7 @@ function StoryContent({ story }: { story: Story }) {
               style={{ flexDirection: "row", alignItems: "center", gap: 20 }}
             >
               <View style={{ gap: 3 }}>
-                <Txt title style={{ fontSize: 34, lineHeight: 40 }}>
+                <Txt title companion style={{ fontSize: 34, lineHeight: 40 }}>
                   {reviewSummary.average?.toFixed(1)}
                   <Txt muted style={{ fontSize: 14 }}>
                     {" "}
@@ -459,7 +459,7 @@ function StoryContent({ story }: { story: Story }) {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <Avatar initials={initials} size={48} />
           <View style={{ flex: 1 }}>
-            <Txt style={{ fontSize: 16, fontWeight: "600" }}>
+            <Txt literary style={{ fontSize: 18, lineHeight: 23 }}>
               {story.author}
             </Txt>
             <Txt muted style={{ fontSize: 11 }}>

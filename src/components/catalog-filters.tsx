@@ -1,3 +1,4 @@
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Modal, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Chip, Chips, Txt } from "./ui";
@@ -87,10 +88,11 @@ export function FilterSheet({
   count: number;
 }) {
   const { theme } = useTheme();
+  const reducedMotion = useReducedMotion();
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType={reducedMotion ? "none" : "slide"}
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >

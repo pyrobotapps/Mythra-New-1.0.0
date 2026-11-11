@@ -30,7 +30,7 @@ export function DiscoveryFilterButton({
 }) {
   const { theme } = useTheme();
   return (
-    <Glass style={{ borderRadius: 24 }}>
+    <Glass style={{ borderRadius: tokens.radii.round }}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={
@@ -130,7 +130,12 @@ export function DiscoveryGenres({
       accessibilityRole="button"
       accessibilityLabel={`Browse ${genre === "Sci-fi" ? "Sci-Fi" : genre}`}
       onPress={() => choose(genre)}
-      style={{ width: 150, height: 72, borderRadius: 12, overflow: "hidden" }}
+      style={{
+        width: 150,
+        height: 72,
+        borderRadius: tokens.radii.card,
+        overflow: "hidden",
+      }}
     >
       <LinearGradient
         colors={[theme.surface, theme.accent + "25"]}

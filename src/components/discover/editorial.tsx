@@ -59,10 +59,10 @@ export function ReleaseSpreads({ stories }: { stories: Story[] }) {
               >
                 {index === 0 ? "JUST LANDED" : "NEW VOICES"}
               </Txt>
-              <Txt title style={{ fontSize: 22, lineHeight: 28 }}>
+              <Txt title companion style={{ fontSize: 22, lineHeight: 28 }}>
                 {story.title}
               </Txt>
-              <Txt muted style={{ fontSize: 11, lineHeight: 17 }}>
+              <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
                 {story.author}
               </Txt>
               <View
@@ -151,6 +151,7 @@ export function RankedBooks({ stories }: { stories: Story[] }) {
           >
             <Txt
               title
+              companion
               style={{
                 width: 27,
                 fontSize: lead ? 42 : 29,
@@ -177,6 +178,7 @@ export function RankedBooks({ stories }: { stories: Story[] }) {
               ) : null}
               <Txt
                 title={lead}
+                companion
                 style={{
                   fontSize: lead ? 22 : 15,
                   lineHeight: lead ? 28 : 21,
@@ -185,7 +187,7 @@ export function RankedBooks({ stories }: { stories: Story[] }) {
               >
                 {story.title}
               </Txt>
-              <Txt muted style={{ fontSize: 12, lineHeight: 18 }}>
+              <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
                 {story.author}
               </Txt>
               <Txt
@@ -241,10 +243,10 @@ export function EditorsPick({ stories }: { stories: Story[] }) {
           >
             THE EDITOR’S NOTE
           </Txt>
-          <Txt title style={{ fontSize: 23, lineHeight: 29 }}>
+          <Txt title companion style={{ fontSize: 23, lineHeight: 29 }}>
             {story.title}
           </Txt>
-          <Txt muted style={{ fontSize: 11, lineHeight: 17 }}>
+          <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
             by {story.author}
           </Txt>
           <Txt muted numberOfLines={5} style={{ fontSize: 12, lineHeight: 20 }}>
@@ -287,7 +289,7 @@ function SmallBook({ story }: { story: Story }) {
         <Txt style={{ fontSize: 15, lineHeight: 21, fontWeight: "600" }}>
           {story.title}
         </Txt>
-        <Txt muted style={{ fontSize: 11, lineHeight: 17 }}>
+        <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
           {story.author}
         </Txt>
         <Txt style={{ fontSize: 10, lineHeight: 16, color: theme.accent }}>
@@ -370,10 +372,10 @@ export function ComingSoonSpread({ stories }: { stories: Story[] }) {
               >
                 ON THE HORIZON
               </Txt>
-              <Txt title style={{ fontSize: 23, lineHeight: 29 }}>
+              <Txt title companion style={{ fontSize: 23, lineHeight: 29 }}>
                 {story.title}
               </Txt>
-              <Txt muted style={{ fontSize: 11, lineHeight: 17 }}>
+              <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
                 {story.author}
               </Txt>
               <Txt muted style={{ fontSize: 11, lineHeight: 18 }}>

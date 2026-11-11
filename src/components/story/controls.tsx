@@ -1,8 +1,10 @@
+import { inkSurfaces } from "@/theme/visual";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { PropsWithChildren } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Classification } from "@/data/stories";
-import { useTheme } from "@/theme";
+import { tokens, useTheme } from "@/theme";
 import { IconButton } from "@/components/glass";
 import { Txt } from "@/components/ui";
 export function Sheet({
@@ -16,11 +18,12 @@ export function Sheet({
   onClose: () => void;
 } & PropsWithChildren) {
   const { theme } = useTheme();
+  const reducedMotion = useReducedMotion();
   return (
     <Modal
       transparent
       visible={visible}
-      animationType="fade"
+      animationType={reducedMotion ? "none" : "fade"}
       onRequestClose={onClose}
     >
       <View
@@ -42,10 +45,10 @@ export function Sheet({
           style={{
             maxHeight: "85%",
             backgroundColor: theme.bg,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
+            borderTopLeftRadius: tokens.radii.sheet,
+            borderTopRightRadius: tokens.radii.sheet,
             borderWidth: 1,
-            borderColor: theme.accent + "25",
+            borderColor: inkSurfaces(theme).border,
           }}
         >
           <View
@@ -58,6 +61,7 @@ export function Sheet({
           >
             <Txt
               title
+              companion
               accessibilityRole="header"
               style={{ flex: 1, fontSize: 24, lineHeight: 30 }}
             >
@@ -101,7 +105,7 @@ export function TextAction({
       style={({ pressed }) => ({
         minHeight: 44,
         justifyContent: "center",
-        opacity: pressed ? 0.6 : 1,
+        opacity: pressed ? tokens.feedback.pressedOpacity : 1,
       })}
     >
       <Txt
@@ -126,7 +130,7 @@ export function DetailSection({
     <View
       style={{
         borderTopWidth: 1,
-        borderColor: theme.accent + "1C",
+        borderColor: inkSurfaces(theme).divider,
         paddingTop: 20,
         gap: 14,
       }}
@@ -135,6 +139,7 @@ export function DetailSection({
         <Txt
           accessibilityRole="header"
           title
+          companion
           style={{ flex: 1, fontSize: 24, lineHeight: 30 }}
         >
           {title}
@@ -161,7 +166,7 @@ export function ClassificationBadge({ value }: { value: Classification }) {
         alignSelf: "flex-start",
         paddingHorizontal: 9,
         paddingVertical: 3,
-        borderRadius: 6,
+        borderRadius: tokens.radii.badge,
         backgroundColor: color + "18",
         borderWidth: 1,
         borderColor: color + "44",

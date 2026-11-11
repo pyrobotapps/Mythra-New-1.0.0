@@ -1,6 +1,13 @@
+import {
+  inkSurfaces,
+  inkTypeface,
+  handwritingTypeface,
+  displayTypeface,
+} from "@/theme/visual";
 import { catalogMode } from "@/config/catalog-mode";
 import React from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -27,19 +34,42 @@ export function Txt({
   style,
   muted,
   title,
+  handwritten = false,
+  literary = false,
+  companion = false,
   ...props
-}: TextProps & { muted?: boolean; title?: boolean }) {
-  const { theme } = useTheme();
+}: TextProps & {
+  muted?: boolean;
+  title?: boolean;
+  handwritten?: boolean;
+  literary?: boolean;
+  companion?: boolean;
+}) {
+  const { theme, fontsReady } = useTheme();
+  const content = React.Children.toArray(props.children)
+    .filter((child) => typeof child === "string" || typeof child === "number")
+    .join("");
+  const fontFamily =
+    handwritten && !companion
+      ? handwritingTypeface(Platform.OS, content, fontsReady)
+      : (title || literary) && !companion
+        ? displayTypeface(Platform.OS, content, fontsReady)
+        : inkTypeface(Platform.OS, content, false);
   return (
     <Text
       {...props}
       style={[
         {
           color: muted ? theme.muted : theme.text,
-          fontSize: 15,
-          lineHeight: 23,
+          fontFamily,
+          fontSize: tokens.typography.bodySize,
+          lineHeight: tokens.typography.bodyLine,
         },
-        title && { fontFamily: tokens.serif, fontSize: 28, lineHeight: 35 },
+        title && {
+          fontSize: companion ? tokens.typography.titleSize : 34,
+          lineHeight: companion ? tokens.typography.titleLine : 42,
+          fontWeight: "400",
+        },
         style,
       ]}
     />
@@ -97,8 +127,9 @@ export function Panel({
       style={[
         {
           backgroundColor: theme.surface,
-          borderRadius: 20,
-          padding: 20,
+          borderRadius: tokens.radii.panel,
+          boxShadow: inkSurfaces(theme).shadow,
+          padding: 18,
           gap: 12,
         },
         style,
@@ -126,18 +157,19 @@ export function Button({
         minHeight: 48,
         paddingHorizontal: 20,
         paddingVertical: 12,
-        borderRadius: 28,
+        borderRadius: tokens.radii.control,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: secondary ? theme.surface : theme.accent,
-        opacity: pressed ? 0.65 : 1,
+        opacity: pressed ? tokens.feedback.pressedOpacity : 1,
       })}
     >
       <Text
         style={{
           color: secondary ? theme.text : theme.bg,
           fontSize: 15,
-          fontWeight: "700",
+          fontWeight: "600",
+          fontFamily: tokens.sans,
         }}
       >
         {label}
@@ -158,7 +190,7 @@ export function Chip({
   return (
     <Glass
       style={{
-        borderRadius: 22,
+        borderRadius: tokens.radii.glass,
         backgroundColor: active ? theme.accent : theme.surface + "80",
         borderColor: active ? theme.accent : theme.accent + "25",
       }}
@@ -173,7 +205,7 @@ export function Chip({
           paddingHorizontal: 16,
           paddingVertical: 9,
           justifyContent: "center",
-          opacity: pressed ? 0.65 : 1,
+          opacity: pressed ? tokens.feedback.pressedOpacity : 1,
         })}
       >
         <Txt
@@ -228,13 +260,13 @@ export function Cover({
       style={{
         width,
         aspectRatio: tokens.coverRatio,
-        borderRadius: 5,
+        borderRadius: tokens.radii.book,
         boxShadow: "2px 5px 10px #00000030",
       }}
     >
       <LinearGradient
         colors={story.colors}
-        style={{ flex: 1, borderRadius: 5, overflow: "hidden" }}
+        style={{ flex: 1, borderRadius: tokens.radii.book, overflow: "hidden" }}
       >
         {source ? (
           <Image
@@ -353,7 +385,7 @@ export function StoryCard({ story, width }: { story: Story; width?: number }) {
       <Txt style={{ fontSize: 14, lineHeight: 19, fontWeight: "600" }}>
         {story.title}
       </Txt>
-      <Txt muted style={{ fontSize: 11, lineHeight: 16 }}>
+      <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
         {story.author}
       </Txt>
       <Txt muted style={{ fontSize: 10, lineHeight: 15 }}>
@@ -375,7 +407,7 @@ export function SectionHeading({
   return (
     <View style={{ gap: 4 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-        <Txt title style={{ flex: 1, fontSize: 25, lineHeight: 31 }}>
+        <Txt title style={{ flex: 1, fontSize: 30, lineHeight: 38 }}>
           {title}
         </Txt>
         {onSeeAll ? (

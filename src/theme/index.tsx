@@ -1,3 +1,4 @@
+import { ink, inkTypeface } from "./visual";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -60,20 +61,33 @@ export const themes = {
 } as const;
 export type ThemeId = keyof typeof themes;
 export const tokens = {
-  radius: 20,
+  radius: ink.radius.panel,
+  radii: ink.radius,
+  typography: ink.typography,
+  feedback: ink.feedback,
+  sans: inkTypeface(Platform.OS, ""),
   coverRatio: 2 / 3,
   tabHeight: 66,
   space: { xs: 4, sm: 8, md: 12, lg: 20, xl: 28, section: 32 },
   gutter: 24,
-  serif: Platform.OS === "android" ? "serif" : "Georgia",
+  serif: inkTypeface(Platform.OS, "", true),
   maxWidth: 1080,
 };
 const Context = createContext<{
   theme: (typeof themes)[ThemeId];
   id: ThemeId;
   setTheme: (id: ThemeId) => void;
-}>({ theme: themes.amethyst, id: "amethyst", setTheme: () => {} });
-export function ThemeProvider({ children }: React.PropsWithChildren) {
+  fontsReady: boolean;
+}>({
+  theme: themes.amethyst,
+  id: "amethyst",
+  setTheme: () => {},
+  fontsReady: false,
+});
+export function ThemeProvider({
+  children,
+  fontsReady = false,
+}: React.PropsWithChildren<{ fontsReady?: boolean }>) {
   const [id, setId] = useState<ThemeId>("amethyst");
   useEffect(() => {
     AsyncStorage.getItem("mythra.theme")
@@ -87,7 +101,7 @@ export function ThemeProvider({ children }: React.PropsWithChildren) {
     void AsyncStorage.setItem("mythra.theme", next).catch(() => {});
   };
   return (
-    <Context.Provider value={{ theme: themes[id], id, setTheme }}>
+    <Context.Provider value={{ theme: themes[id], id, setTheme, fontsReady }}>
       {children}
     </Context.Provider>
   );

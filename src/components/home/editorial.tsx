@@ -1,3 +1,4 @@
+import { inkSurfaces } from "@/theme/visual";
 import { browsingCoverWidth } from "@/theme/browsing";
 import { useState } from "react";
 import {
@@ -57,16 +58,20 @@ export function NextRead({ stories }: { stories: Story[] }) {
       onPress={() => openCollection("next")}
       onLayout={onLayout}
       style={({ pressed }) => ({
-        borderRadius: 18,
+        borderRadius: tokens.radii.editorial,
         opacity: pressed ? 0.9 : 1,
       })}
     >
       <LinearGradient
-        colors={[theme.surface, theme.accent + "24", theme.surface]}
-        style={{ borderRadius: 18, paddingTop: 24, gap: 20 }}
+        colors={inkSurfaces(theme).editorialGradient}
+        style={{
+          borderRadius: tokens.radii.editorial,
+          paddingTop: 24,
+          gap: 20,
+        }}
       >
         <View style={{ paddingHorizontal: 20, gap: 10 }}>
-          <Txt title style={{ fontSize: 28, lineHeight: 34 }}>
+          <Txt title style={{ fontSize: 32, lineHeight: 40 }}>
             Find Your Next Read
           </Txt>
           <Txt muted style={{ fontSize: 13, lineHeight: 21 }}>
@@ -220,8 +225,8 @@ function AuthorShowcase({
         height: layout.itemHeight,
         padding: 10,
         borderWidth: 1,
-        borderColor: theme.accent + "20",
-        borderRadius: 12,
+        borderColor: inkSurfaces(theme).border,
+        borderRadius: tokens.radii.card,
         backgroundColor: theme.surface + "60",
         gap: 4,
       }}

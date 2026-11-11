@@ -103,7 +103,9 @@ test("inclusive relationships and long titles are represented without duplicate 
   assert.deepEqual(catalog.toggleSelection(["BL", "GL"], "BL"), ["GL"]);
 });
 
+const visual = load("src/theme/visual.ts");
 const { themes } = load("src/theme/index.tsx", {
+  "./visual": visual,
   "react-native": { Platform: { OS: "ios" } },
   "@react-native-async-storage/async-storage": { default: {} },
 });
@@ -664,4 +666,163 @@ test("one through five-plus books preserve identical five-slot author cards", ()
     }
     assert.ok(Math.abs(layout.itemHeight - layout.covers.height - 72) < 0.001);
   }
+});
+
+test("literary typography falls back for multilingual scripts without font downloads", () => {
+  for (const platform of ["ios", "android", "web"]) {
+    for (const text of [
+      "한국어",
+      "日本語",
+      "简体中文",
+      "ไทย",
+      "العربية",
+      "हिन्दी",
+    ]) {
+      assert.equal(
+        visual.inkTypeface(platform, text, true),
+        visual.inkTypeface(platform, text, false),
+      );
+    }
+    assert.notEqual(
+      visual.inkTypeface(platform, "Ink & Elegance", true),
+      visual.inkTypeface(platform, "Ink & Elegance", false),
+    );
+    for (const text of ["Tiếng Việt", "Español", "Русский"])
+      assert.ok(visual.inkTypeface(platform, text, true));
+  }
+});
+test("ink surface polish keeps all six palettes and approved cover geometry", () => {
+  for (const theme of Object.values(themes)) {
+    const surfaces = visual.inkSurfaces(theme);
+    assert.ok(surfaces.border.startsWith(theme.accent));
+    assert.ok(surfaces.glass.startsWith(theme.surface));
+    assert.equal(surfaces.editorialGradient[0], theme.surface);
+  }
+  assert.equal(visual.ink.radius.book, 5);
+  assert.equal(browsing.browsingCover.width, 110);
+  assert.equal(visual.ink.typography.bodyLine, 23);
+  assert.equal(visual.ink.typography.titleLine, 35);
+});
+
+test("motion preferences default safely, update live, and clean up on unmount", async () => {
+  let state,
+    effect,
+    handler,
+    removed = false;
+  const hook = load("src/hooks/use-reduced-motion.ts", {
+    react: {
+      useState: (initial) => {
+        state = initial;
+        return [
+          state,
+          (value) => {
+            state = value;
+          },
+        ];
+      },
+      useEffect: (callback) => {
+        effect = callback;
+      },
+    },
+    "react-native": {
+      AccessibilityInfo: {
+        addEventListener: (name, callback) => {
+          assert.equal(name, "reduceMotionChanged");
+          handler = callback;
+          return {
+            remove: () => {
+              removed = true;
+            },
+          };
+        },
+        isReduceMotionEnabled: () => Promise.resolve(false),
+      },
+    },
+  });
+  assert.equal(hook.useReducedMotion(), true);
+  const cleanup = effect();
+  await Promise.resolve();
+  assert.equal(state, false);
+  handler(true);
+  assert.equal(state, true);
+  cleanup();
+  assert.equal(removed, true);
+  handler(false);
+  assert.equal(state, true);
+});
+
+test("real handwriting is opt-in to loaded fonts and Latin-supported text only", () => {
+  for (const platform of ["ios", "android", "web"]) {
+    for (const text of [
+      "MYTHRA",
+      "Find Your Next Read",
+      "Books by Authors",
+      "Tiếng Việt",
+      "Español",
+    ]) {
+      assert.equal(
+        visual.handwritingTypeface(platform, text, true),
+        visual.handwritingFamily,
+      );
+      assert.equal(
+        visual.handwritingTypeface(platform, text, false),
+        visual.inkTypeface(platform, text, false),
+      );
+    }
+    for (const text of [
+      "한국어",
+      "日本語",
+      "简体中文",
+      "ไทย",
+      "Русский",
+      "العربية",
+    ]) {
+      assert.equal(
+        visual.handwritingTypeface(platform, text, true),
+        visual.inkTypeface(platform, text, false),
+      );
+    }
+  }
+  const font = fs.readFileSync(
+    "node_modules/@expo-google-fonts/dancing-script/600SemiBold/DancingScript_600SemiBold.ttf",
+  );
+  assert.equal(font.readUInt32BE(0), 0x00010000);
+});
+
+test("Cormorant Infant is primary while handwriting remains a separate opt-in accent", () => {
+  for (const platform of ["ios", "android", "web"]) {
+    for (const text of [
+      "MYTHRA",
+      "Books by Authors",
+      "Elara Quill",
+      "Tiếng Việt",
+      "Español",
+    ]) {
+      assert.equal(
+        visual.displayTypeface(platform, text, true),
+        visual.displayFamily,
+      );
+      assert.notEqual(visual.displayFamily, visual.handwritingFamily);
+      assert.equal(
+        visual.displayTypeface(platform, text, false),
+        visual.inkTypeface(platform, text, false),
+      );
+    }
+    for (const text of [
+      "한국어",
+      "日本語",
+      "简体中文",
+      "Русский",
+      "ไทย",
+      "العربية",
+    ])
+      assert.equal(
+        visual.displayTypeface(platform, text, true),
+        visual.inkTypeface(platform, text, false),
+      );
+  }
+  const font = fs.readFileSync(
+    "node_modules/@expo-google-fonts/cormorant-infant/600SemiBold/CormorantInfant_600SemiBold.ttf",
+  );
+  assert.equal(font.readUInt32BE(0), 0x00010000);
 });

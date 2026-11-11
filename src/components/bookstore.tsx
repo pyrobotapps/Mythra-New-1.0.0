@@ -1,3 +1,4 @@
+import { inkSurfaces } from "@/theme/visual";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,17 +19,20 @@ export function StoreHeader({
     <View style={[styles.row, { justifyContent: "space-between" }]}>
       <View style={{ flex: 1, gap: 2 }}>
         <Txt
+          title
           style={{
-            fontFamily: tokens.serif,
-            fontSize: 25,
-            lineHeight: 30,
-            letterSpacing: 3,
+            fontSize: 36,
+            lineHeight: 44,
             color: theme.text,
           }}
         >
           MYTHRA
         </Txt>
-        <Txt muted style={{ fontSize: 11, lineHeight: 16 }}>
+        <Txt
+          muted
+          handwritten={!title}
+          style={{ fontSize: title ? 11 : 16, lineHeight: title ? 16 : 18 }}
+        >
           {title ?? "Stories without limits"}
         </Txt>
       </View>
@@ -142,6 +146,7 @@ export function ChartRow({
     >
       <Txt
         title
+        companion
         style={{
           width: 28,
           fontSize: 28,
@@ -156,7 +161,7 @@ export function ChartRow({
         <Txt style={{ fontSize: 14, lineHeight: 20, fontWeight: "600" }}>
           {story.title}
         </Txt>
-        <Txt muted style={{ fontSize: 12, lineHeight: 18 }}>
+        <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
           {story.author}
         </Txt>
         <Txt muted style={{ fontSize: 11, lineHeight: 17 }}>
@@ -209,12 +214,12 @@ export function EditorialFeature({ story }: { story: Story | undefined }) {
           id === "aurora" ? ["#684062", "#24495C"] : [theme.surface, theme.bg]
         }
         style={{
-          borderRadius: 18,
+          borderRadius: tokens.radii.editorial,
           padding: 18,
           flexDirection: "row",
           gap: 18,
           borderWidth: 1,
-          borderColor: theme.accent + "20",
+          borderColor: inkSurfaces(theme).border,
         }}
       >
         <View style={{ flex: 1, justifyContent: "center", gap: 8 }}>
@@ -228,7 +233,7 @@ export function EditorialFeature({ story }: { story: Story | undefined }) {
           >
             THE EDITOR’S SPOTLIGHT
           </Txt>
-          <Txt title style={{ fontSize: 24, lineHeight: 29 }}>
+          <Txt title companion style={{ fontSize: 24, lineHeight: 29 }}>
             {story.title}
           </Txt>
           <Txt muted style={{ fontSize: 12, lineHeight: 18 }}>

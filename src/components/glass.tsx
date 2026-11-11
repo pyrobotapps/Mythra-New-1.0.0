@@ -1,7 +1,8 @@
+import { inkSurfaces } from "@/theme/visual";
 import { PropsWithChildren } from "react";
 import { Pressable, StyleProp, ViewStyle } from "react-native";
 import { BlurView } from "expo-blur";
-import { useTheme } from "@/theme";
+import { tokens, useTheme } from "@/theme";
 import { Icon, IconName } from "./icon";
 export function Glass({
   children,
@@ -14,10 +15,10 @@ export function Glass({
       intensity={55}
       style={[
         {
-          backgroundColor: theme.surface + "82",
-          borderColor: theme.accent + "26",
+          backgroundColor: inkSurfaces(theme).glass,
+          borderColor: inkSurfaces(theme).border,
           borderWidth: 1,
-          borderRadius: 22,
+          borderRadius: tokens.radii.glass,
           overflow: "hidden",
         },
         style,
@@ -38,7 +39,7 @@ export function IconButton({
 }) {
   const { theme } = useTheme();
   return (
-    <Glass style={{ borderRadius: 24 }}>
+    <Glass style={{ borderRadius: tokens.radii.round }}>
       <Pressable
         onPress={onPress}
         accessibilityLabel={label}
@@ -48,7 +49,7 @@ export function IconButton({
           height: 44,
           alignItems: "center",
           justifyContent: "center",
-          opacity: pressed ? 0.6 : 1,
+          opacity: pressed ? tokens.feedback.pressedOpacity : 1,
         })}
       >
         <Icon name={name} color={theme.text} size={20} />
