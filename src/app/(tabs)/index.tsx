@@ -24,17 +24,26 @@ import {
 import { useTheme } from "@/theme";
 const homeKeys = [
   "picks",
-  "new",
   "trending",
   "novels",
   "toons",
   "shorts",
-  "bl",
-  "gl",
   "mf",
   "completed",
-  "updated",
 ];
+function homeShelf(key: string) {
+  const c = collections.find((collection) => collection.key === key)!;
+  return (
+    <Shelf
+      key={key}
+      title={c.title}
+      subtitle={c.subtitle}
+      stories={collectionStories(key)}
+      collectionKey={key}
+      twoRows={c.layout === "double"}
+    />
+  );
+}
 export default function Home() {
   const { theme } = useTheme();
   const { state } = useDiscovery();
@@ -74,7 +83,9 @@ export default function Home() {
         </View>
       </View>
       {editorial ? <NextRead stories={editorial.next} /> : null}
+      {homeShelf("gl")}
       <EditorialFeature story={visibleStories[0]} />
+      {homeShelf("bl")}
       {editorial ? (
         <BooksByAuthors
           collections={
@@ -84,20 +95,10 @@ export default function Home() {
           }
         />
       ) : null}
+      {homeShelf("updated")}
       <ChartShelf stories={collectionStories("charts")} />
-      {homeKeys.map((key) => {
-        const c = collections.find((c) => c.key === key)!;
-        return (
-          <Shelf
-            key={key}
-            title={c.title}
-            subtitle={c.subtitle}
-            stories={collectionStories(key)}
-            collectionKey={key}
-            twoRows={c.layout === "double"}
-          />
-        );
-      })}
+      {homeShelf("new")}
+      {homeKeys.map(homeShelf)}
       <View style={{ gap: 12 }}>
         <SectionHeading
           title="Following"
