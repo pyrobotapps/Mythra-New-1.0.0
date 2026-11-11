@@ -1,5 +1,7 @@
+import { Destination, Section } from "@/features/experience/components";
+import { openExperience } from "@/features/experience/navigation";
 import { View } from "react-native";
-import { Chip, DemoNote, Page, Panel, Txt } from "@/components/ui";
+import { Button, Chip, DemoNote, Page, Panel, Txt } from "@/components/ui";
 import { ThemeId, themes, useTheme } from "@/theme";
 export default function Profile() {
   const { id, setTheme } = useTheme();
@@ -30,13 +32,39 @@ export default function Profile() {
           />
         ))}
       </View>
-      <Panel>
-        <Txt>Preferences · Coming in a later stage</Txt>
-        <Txt muted>
-          Reading defaults, notifications, account settings, and language
-          preferences.
-        </Txt>
-      </Panel>
+      <Button
+        label="Sign in · account preview"
+        onPress={() => openExperience("sign-in")}
+      />
+      <Section title="Your reading world">
+        <Destination title="Reader profile" screen="reader-profile" />
+        <Destination title="Community & messages" screen="community" />
+        <Destination title="Preferences & account" screen="settings" />
+      </Section>
+      {__DEV__ ? (
+        <>
+          <Section title="Support stories">
+            <Destination title="MYTHRA+ membership" screen="membership" />
+            <Destination title="Subscriptions & coins" screen="wallet" />
+            <Destination
+              title="Translator marketplace"
+              screen="translator-marketplace"
+            />
+          </Section>
+          <Section title="Phase 1 design review">
+            <Destination
+              title="Experience map"
+              detail="All secondary designs and integration boundaries"
+              screen="experience-map"
+            />
+            <Destination
+              title="Administration design preview"
+              detail="No admin access is granted"
+              screen="admin"
+            />
+          </Section>
+        </>
+      ) : null}
     </Page>
   );
 }

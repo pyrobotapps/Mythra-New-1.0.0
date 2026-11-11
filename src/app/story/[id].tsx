@@ -1,3 +1,4 @@
+import { openExperience } from "@/features/experience/navigation";
 import { findAuthorPreview } from "@/data/author-preview";
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
@@ -72,10 +73,10 @@ function StoryContent({ story }: { story: Story }) {
       `${label} is not available in this layout preview. No account or community service is connected yet.`,
     );
   const openChapter = (number: number) =>
-    explain(
-      `Chapter ${number}`,
-      `The chapter list is available to preview, but chapter text and the ${story.format === "Toon" ? "toon" : "novel"} reader have not been built yet.`,
-    );
+    router.push({
+      pathname: "/reader/[id]",
+      params: { id: story.id, chapter: number, language },
+    });
   const share = async () => {
     const url = Linking.createURL(`/story/${story.id}`);
     try {
@@ -144,7 +145,7 @@ function StoryContent({ story }: { story: Story }) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`About ${story.author}`}
-              onPress={() => setDialog("creator")}
+              onPress={() => openExperience("creator-profile", story.id)}
             >
               <Txt muted literary style={{ fontSize: 14, lineHeight: 18 }}>
                 by {story.author}
@@ -303,10 +304,12 @@ function StoryContent({ story }: { story: Story }) {
         </View>
         <TextAction
           label="View All Chapters"
-          onPress={() => {
-            setChapterLimit(15);
-            setDialog("chapters");
-          }}
+          onPress={() =>
+            router.push({
+              pathname: "/chapters/[id]",
+              params: { id: story.id, language },
+            })
+          }
         />
       </DetailSection>
       <DetailSection
@@ -314,7 +317,7 @@ function StoryContent({ story }: { story: Story }) {
         action={
           <TextAction
             label="Write Review"
-            onPress={() => unavailable("Write Review")}
+            onPress={() => openExperience("write-review", story.id)}
           />
         }
       >
@@ -437,7 +440,7 @@ function StoryContent({ story }: { story: Story }) {
                 <TextAction
                   label="Report review"
                   muted
-                  onPress={() => unavailable("Report review")}
+                  onPress={() => openExperience("report", story.id)}
                 />
               </View>
             ))}
@@ -468,7 +471,7 @@ function StoryContent({ story }: { story: Story }) {
           </View>
           <TextAction
             label="View Profile"
-            onPress={() => setDialog("creator")}
+            onPress={() => openExperience("creator-profile", story.id)}
           />
         </View>
         <Txt muted style={{ fontSize: 13, lineHeight: 21 }}>
@@ -533,7 +536,17 @@ function StoryContent({ story }: { story: Story }) {
               <TextAction
                 key={label}
                 label={label}
-                onPress={() => unavailable(label)}
+                onPress={() => {
+                  setDialog(null);
+                  const destinations: Record<string, string> = {
+                    "Add to Reading List": "collections",
+                    "Follow Story": "following",
+                    "Story Update Notifications": "notification-settings",
+                    "Super Like": "super-like",
+                    "Report Story": "report",
+                  };
+                  openExperience(destinations[label], story.id);
+                }}
               />
             ))}
           </>
